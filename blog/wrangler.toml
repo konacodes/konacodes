@@ -1,0 +1,17 @@
+name = "kona-blog"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "kona-blog-db"
+database_id = "e3fe50f3-40ed-4943-85c4-4e5ece3f992a"
+
+# Custom domain: blog.kcodes.me
+# Configure in Cloudflare dashboard after deployment
+
+# Routes protected by Cloudflare Access:
+# /admin/* - main admin area
+# /e/* - edit routes
+# /api/admin/* - admin API endpoints
