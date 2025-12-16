@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import "./index.css";
+import { IntroSequence } from "./IntroSequence";
 
 // Custom cursor component
 function CustomCursor() {
@@ -657,21 +658,56 @@ function Footer() {
 
 // Main App
 export function App() {
+  const [showIntro, setShowIntro] = useState(() => {
+    // Check if user has visited before
+    if (typeof window !== 'undefined') {
+      const hasVisited = localStorage.getItem('kcodes-visited');
+      return !hasVisited;
+    }
+    return true;
+  });
+  const [siteVisible, setSiteVisible] = useState(false);
+
+  const handleIntroComplete = useCallback(() => {
+    // Mark as visited
+    localStorage.setItem('kcodes-visited', 'true');
+    setShowIntro(false);
+    // Small delay then fade in site
+    setTimeout(() => setSiteVisible(true), 100);
+  }, []);
+
+  // If skipping intro, show site immediately
+  useEffect(() => {
+    if (!showIntro) {
+      setSiteVisible(true);
+    }
+  }, [showIntro]);
+
   return (
     <div className="relative">
-      <CustomCursor />
-      <MeshBackground />
-      <GridBackground />
-      <ParticleField />
+      {/* Intro sequence */}
+      {showIntro && <IntroSequence onComplete={handleIntroComplete} />}
 
-      <main className="relative z-10">
-        <Hero />
-        <About />
-        <Projects />
-        <Contact />
-      </main>
+      {/* Main site */}
+      <div
+        className={`transition-opacity duration-1000 ${
+          siteVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <CustomCursor />
+        <MeshBackground />
+        <GridBackground />
+        <ParticleField />
 
-      <Footer />
+        <main className="relative z-10">
+          <Hero />
+          <About />
+          <Projects />
+          <Contact />
+        </main>
+
+        <Footer />
+      </div>
     </div>
   );
 }
