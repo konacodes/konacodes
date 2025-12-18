@@ -1,0 +1,17 @@
+name = "kona-films"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "kona-films-db"
+database_id = "eff76c2d-65fd-4c54-acd6-653c9b8da821"
+
+# Custom domain: films.kcodes.me
+# Configure in Cloudflare dashboard after deployment
+
+# Routes protected by Cloudflare Access (add to existing application):
+# /admin/* - main admin area
+# /e/* - edit routes
+# /api/posts* - admin API endpoints

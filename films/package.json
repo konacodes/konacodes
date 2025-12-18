@@ -1,0 +1,20 @@
+{
+  "name": "kona-films",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create kona-films-db",
+    "db:init": "wrangler d1 execute kona-films-db --file=./schema.sql --remote",
+    "db:init:local": "wrangler d1 execute kona-films-db --local --file=./schema.sql"
+  },
+  "dependencies": {
+    "marked": "^12.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241205.0",
+    "typescript": "^5.0.0",
+    "wrangler": "^3.99.0"
+  }
+}
