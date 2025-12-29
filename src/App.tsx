@@ -1,6 +1,353 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, ReactNode } from "react";
 import "./index.css";
 import { IntroSequence } from "./IntroSequence";
+
+// ============================================
+// WebGL Gradient Mesh Background
+// ============================================
+const vertexShaderSource = `
+  attribute vec2 a_position;
+  void main() {
+    gl_Position = vec4(a_position, 0.0, 1.0);
+  }
+`;
+
+const fragmentShaderSource = `
+  precision highp float;
+  uniform vec2 u_resolution;
+  uniform float u_time;
+  uniform vec2 u_mouse;
+
+  // Simplex noise function
+  vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+  float snoise(vec2 v) {
+    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+    vec2 i  = floor(v + dot(v, C.yy));
+    vec2 x0 = v - i + dot(i, C.xx);
+    vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+    i = mod289(i);
+    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+    m = m*m; m = m*m;
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 ox = floor(x + 0.5);
+    vec3 a0 = x - ox;
+    m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+    vec3 g;
+    g.x = a0.x * x0.x + h.x * x0.y;
+    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+    return 130.0 * dot(m, g);
+  }
+
+  void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution;
+    vec2 mouseNorm = u_mouse / u_resolution;
+
+    // Mouse displacement
+    float mouseDist = length(uv - mouseNorm);
+    float mouseInfluence = smoothstep(0.4, 0.0, mouseDist) * 0.15;
+    vec2 displacement = (uv - mouseNorm) * mouseInfluence;
+
+    vec2 distortedUV = uv + displacement;
+
+    // Layered noise for organic movement
+    float noise1 = snoise(distortedUV * 2.0 + u_time * 0.1);
+    float noise2 = snoise(distortedUV * 3.0 - u_time * 0.15 + 100.0);
+    float noise3 = snoise(distortedUV * 1.5 + u_time * 0.08 + 200.0);
+
+    // Color palette - purples, pinks, blues
+    vec3 color1 = vec3(0.46, 0.29, 0.64); // #764ba2
+    vec3 color2 = vec3(0.94, 0.58, 0.98); // #f093fb
+    vec3 color3 = vec3(0.4, 0.5, 0.9);    // Blue accent
+    vec3 color4 = vec3(0.02, 0.02, 0.05); // Near black
+
+    // Mix colors based on noise
+    vec3 gradient = mix(color4, color1, smoothstep(-0.5, 0.8, noise1) * 0.5);
+    gradient = mix(gradient, color2, smoothstep(0.0, 1.0, noise2) * 0.3);
+    gradient = mix(gradient, color3, smoothstep(0.2, 1.0, noise3) * 0.2);
+
+    // Add mouse glow
+    float glow = smoothstep(0.3, 0.0, mouseDist) * 0.4;
+    gradient += vec3(0.94, 0.58, 0.98) * glow;
+
+    // Vignette
+    float vignette = 1.0 - smoothstep(0.3, 0.9, length(uv - 0.5) * 1.2);
+    gradient *= vignette * 0.7 + 0.3;
+
+    gl_FragColor = vec4(gradient, 1.0);
+  }
+`;
+
+function WebGLBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const animationRef = useRef<number>(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const gl = canvas.getContext('webgl');
+    if (!gl) {
+      console.warn('WebGL not supported, falling back to CSS background');
+      return;
+    }
+
+    // Create shaders
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER)!;
+    gl.shaderSource(vertexShader, vertexShaderSource);
+    gl.compileShader(vertexShader);
+
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)!;
+    gl.shaderSource(fragmentShader, fragmentShaderSource);
+    gl.compileShader(fragmentShader);
+
+    // Create program
+    const program = gl.createProgram()!;
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    // Create geometry (full-screen quad)
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1, 1, -1, -1, 1,
+      -1, 1, 1, -1, 1, 1
+    ]), gl.STATIC_DRAW);
+
+    const positionLocation = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    // Get uniform locations
+    const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    const timeLocation = gl.getUniformLocation(program, 'u_time');
+    const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+
+    // Resize handler
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Mouse handler
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: canvas.height - e.clientY };
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Animation loop
+    const startTime = Date.now();
+    const animate = () => {
+      const time = (Date.now() - startTime) / 1000;
+
+      gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+      gl.uniform1f(timeLocation, time);
+      gl.uniform2f(mouseLocation, mouseRef.current.x, mouseRef.current.y);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationRef.current);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: -1 }}
+    />
+  );
+}
+
+// ============================================
+// Ripple Text Component
+// ============================================
+function RippleText({ children, className = '' }: { children: string; className?: string }) {
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const [ripples, setRipples] = useState<Array<{ id: number; x: number; charIndex: number }>>([]);
+  const rippleIdRef = useRef(0);
+
+  const handleClick = (e: React.MouseEvent) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const charWidth = rect.width / children.length;
+    const charIndex = Math.floor(x / charWidth);
+
+    const rippleId = rippleIdRef.current++;
+    setRipples(prev => [...prev, { id: rippleId, x, charIndex }]);
+
+    // Remove ripple after animation
+    setTimeout(() => {
+      setRipples(prev => prev.filter(r => r.id !== rippleId));
+    }, 600);
+  };
+
+  return (
+    <span
+      ref={containerRef}
+      className={`inline-block cursor-pointer ${className}`}
+      onClick={handleClick}
+    >
+      {children.split('').map((char, i) => {
+        // Calculate wave offset for each character based on active ripples
+        const waveOffset = ripples.reduce((acc, ripple) => {
+          const distance = Math.abs(i - ripple.charIndex);
+          const maxDistance = 8;
+          if (distance < maxDistance) {
+            const progress = (Date.now() % 600) / 600;
+            const wave = Math.sin((distance / maxDistance) * Math.PI + progress * Math.PI * 2);
+            const decay = 1 - (distance / maxDistance);
+            return acc + wave * decay * 3;
+          }
+          return acc;
+        }, 0);
+
+        return (
+          <span
+            key={i}
+            className="inline-block transition-transform duration-75"
+            style={{
+              transform: ripples.length > 0 ? `translateY(${waveOffset}px)` : 'none',
+              animationName: ripples.some(r => Math.abs(i - r.charIndex) < 8) ? 'rippleWave' : 'none',
+              animationDuration: '0.6s',
+              animationTimingFunction: 'ease-out',
+              animationDelay: `${Math.abs(i - (ripples[ripples.length - 1]?.charIndex ?? 0)) * 0.02}s`,
+            }}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+// ============================================
+// Magnetic Button Component
+// ============================================
+function MagneticButton({
+  children,
+  className = '',
+  href,
+  onClick,
+}: {
+  children: ReactNode;
+  className?: string;
+  href?: string;
+  onClick?: () => void;
+}) {
+  const buttonRef = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [impact, setImpact] = useState(false);
+  const [shockwaves, setShockwaves] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const shockwaveIdRef = useRef(0);
+  const wasHovered = useRef(false);
+
+  useEffect(() => {
+    const button = buttonRef.current;
+    if (!button) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = button.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const distX = e.clientX - centerX;
+      const distY = e.clientY - centerY;
+      const distance = Math.sqrt(distX * distX + distY * distY);
+
+      const magneticRadius = 100;
+      const isInRange = distance < magneticRadius;
+
+      if (isInRange) {
+        const strength = (magneticRadius - distance) / magneticRadius;
+        setPosition({
+          x: distX * strength * 0.4,
+          y: distY * strength * 0.4,
+        });
+        setIsHovered(true);
+
+        // Trigger impact on first entry
+        if (!wasHovered.current) {
+          wasHovered.current = true;
+          setImpact(true);
+
+          // Add shockwave
+          const shockwaveId = shockwaveIdRef.current++;
+          setShockwaves(prev => [...prev, {
+            id: shockwaveId,
+            x: rect.width / 2 + position.x,
+            y: rect.height / 2 + position.y
+          }]);
+
+          setTimeout(() => setImpact(false), 150);
+          setTimeout(() => {
+            setShockwaves(prev => prev.filter(s => s.id !== shockwaveId));
+          }, 500);
+        }
+      } else {
+        setPosition({ x: 0, y: 0 });
+        setIsHovered(false);
+        wasHovered.current = false;
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [position.x, position.y]);
+
+  const Component = href ? 'a' : 'button';
+  const props = href ? { href, target: '_blank', rel: 'noopener noreferrer' } : { onClick };
+
+  return (
+    <Component
+      ref={buttonRef as any}
+      className={`magnetic relative inline-block ${className}`}
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px) scale(${impact ? 0.95 : isHovered ? 1.05 : 1})`,
+        transition: impact ? 'transform 0.1s ease-out' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      }}
+      {...props}
+    >
+      {/* Shockwave rings */}
+      {shockwaves.map(shock => (
+        <span
+          key={shock.id}
+          className="absolute pointer-events-none rounded-full border border-[#f093fb]"
+          style={{
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            animation: 'shockwave 0.5s ease-out forwards',
+          }}
+        />
+      ))}
+      {children}
+    </Component>
+  );
+}
 
 // Custom cursor component
 function CustomCursor() {
@@ -334,9 +681,9 @@ function Hero() {
       <div className="overflow-hidden">
         <p
           className="text-xl md:text-2xl text-white/50 font-light tracking-wide animate-slide-up opacity-0"
-          style={{ animationDelay: '0.3s' }}
+          style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
         >
-          i build things for the web
+          <RippleText>i build things for the web</RippleText>
         </p>
       </div>
 
@@ -432,7 +779,7 @@ function About() {
               isVisible ? 'animate-slide-up' : 'opacity-0'
             }`}
           >
-            {greeting}
+            <RippleText>{greeting}</RippleText>
           </p>
         </div>
 
@@ -676,26 +1023,26 @@ function Contact() {
           }`}
           style={{ animationDelay: '0.1s' }}
         >
-          wanna chat? <span className="font-serif italic text-[#f093fb]">say hi</span>
+          <RippleText>wanna chat?</RippleText> <span className="font-serif italic text-[#f093fb]">say hi</span>
         </h2>
 
         <div
-          className={`flex justify-center gap-6 ${
+          className={`flex justify-center gap-8 ${
             isVisible ? 'animate-slide-up' : 'opacity-0'
           }`}
           style={{ animationDelay: '0.2s' }}
         >
           {links.map((link) => (
-            <a
+            <MagneticButton
               key={link.name}
               href={link.href}
-              className="group relative px-8 py-4 glass rounded-full hover:bg-white/5 transition-all duration-300 magnetic"
+              className="group relative px-8 py-4 glass rounded-full hover:bg-white/5 transition-colors duration-300"
             >
               <span className="relative z-10 font-mono text-sm text-white/60 group-hover:text-white transition-colors">
                 {link.name}
               </span>
               <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#764ba2]/20 to-[#f093fb]/20" />
-            </a>
+            </MagneticButton>
           ))}
         </div>
       </div>
@@ -758,7 +1105,7 @@ export function App() {
         }`}
       >
         <CustomCursor />
-        <MeshBackground />
+        <WebGLBackground />
         <GridBackground />
         <ParticleField />
 
