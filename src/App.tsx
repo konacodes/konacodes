@@ -483,7 +483,22 @@ function About() {
   );
 }
 
-// Projects placeholder section
+// Projects section
+const projects = [
+  {
+    title: 'Duck',
+    emoji: '🦆',
+    description: 'a programming language where you have to say "quack" or the goose won\'t run your code. the goose has opinions about your code and rates it from 1-10. good luck getting a 10.',
+    tech: ['Rust'],
+    github: 'https://github.com/konacodes/duck-lang',
+    code: `quack
+[let greeting be "Hello, World!"]
+
+quack
+[print greeting]`,
+  },
+];
+
 function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -521,42 +536,90 @@ function Projects() {
           </p>
         </div>
 
-        {/* Coming soon state with creative treatment */}
-        <div
-          className={`relative ${isVisible ? 'animate-scale-in' : 'opacity-0'}`}
-          style={{ animationDelay: '0.2s' }}
-        >
-          <div className="glass-strong rounded-3xl p-12 md:p-20 text-center relative overflow-hidden">
-            {/* Animated border */}
-            <div className="absolute inset-0 rounded-3xl overflow-hidden">
-              <div
-                className="absolute inset-[-50%] animate-spin"
-                style={{
-                  background: 'conic-gradient(from 0deg, transparent, #764ba2, transparent)',
-                  animationDuration: '8s',
-                }}
-              />
-            </div>
-            <div className="absolute inset-[1px] rounded-3xl bg-[#0a0a0a]" />
+        {/* Projects grid */}
+        <div className="grid gap-8">
+          {projects.map((project, index) => (
+            <div
+              key={project.title}
+              className={`relative ${isVisible ? 'animate-scale-in' : 'opacity-0'}`}
+              style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+            >
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block group"
+              >
+                <div className="glass-strong rounded-3xl p-8 md:p-12 relative overflow-hidden transition-all duration-500 hover:scale-[1.02]">
+                  {/* Animated border on hover */}
+                  <div className="absolute inset-0 rounded-3xl overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div
+                      className="absolute inset-[-50%] animate-spin"
+                      style={{
+                        background: 'conic-gradient(from 0deg, transparent, #764ba2, transparent)',
+                        animationDuration: '8s',
+                      }}
+                    />
+                  </div>
+                  <div className="absolute inset-[1px] rounded-3xl bg-[#0a0a0a]" />
 
-            <div className="relative z-10">
-              <h3 className="text-3xl md:text-4xl font-light mb-4">
-                nothing here <span className="font-serif italic text-[#f093fb]">yet</span>
-              </h3>
-              <p className="text-white/40 max-w-md mx-auto">
-                still working on some things. check back in a bit — or don't,
-                i'll probably post about it somewhere anyway.
-              </p>
+                  <div className="relative z-10">
+                    <div className="flex flex-col md:flex-row md:items-start gap-8">
+                      {/* Project info */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-4xl">{project.emoji}</span>
+                          <h3 className="text-2xl md:text-3xl font-light">
+                            {project.title}
+                          </h3>
+                        </div>
 
-              {/* Decorative code snippet */}
-              <div className="mt-12 inline-block text-left">
-                <pre className="font-mono text-xs text-white/30 leading-relaxed">
-                  <code>{`// TODO: ship something
-const projects = [];`}</code>
-                </pre>
-              </div>
+                        <p className="text-white/50 mb-6 max-w-xl leading-relaxed">
+                          {project.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {project.tech.map((tech) => (
+                            <span
+                              key={tech}
+                              className="px-3 py-1 text-xs font-mono rounded-full bg-white/5 text-white/60 border border-white/10"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm text-white/40 group-hover:text-[#f093fb] transition-colors">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                          </svg>
+                          <span>view on github</span>
+                          <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      {/* Code snippet */}
+                      <div className="md:w-80 shrink-0">
+                        <div className="rounded-xl bg-black/50 border border-white/10 overflow-hidden">
+                          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                            <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                            <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                            <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                            <span className="ml-2 text-xs text-white/30 font-mono">hello.duck</span>
+                          </div>
+                          <pre className="p-4 font-mono text-xs text-white/60 leading-relaxed overflow-x-auto">
+                            <code>{project.code}</code>
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
