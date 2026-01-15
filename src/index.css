@@ -67,40 +67,10 @@ body::before {
   display: none;
 }
 
-/* Plate base styles - optimized for 3D rendering */
+/* Plate base styles */
 .plate {
   will-change: transform, opacity;
   backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-  /* Force GPU layer to prevent grainy rendering */
-  -webkit-transform: translateZ(0);
-  -webkit-font-smoothing: subpixel-antialiased;
-}
-
-/* 3D world container optimization */
-.world-3d {
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
-  -webkit-perspective: 1000px;
-}
-
-/* Image and text rendering for crisp zoom */
-.plate img {
-  image-rendering: auto;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-}
-
-.plate * {
-  /* Prevent blurry text during 3D transforms */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Lifted button hover effects */

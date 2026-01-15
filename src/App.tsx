@@ -255,12 +255,11 @@ function MultiplaneWorld() {
     // How far past this layer have we scrolled?
     const distancePastLayer = scrollDepth - layerDistance;
 
-    // Layer is far ahead (not reached yet) - adjusted for wider spacing
+    // Layer is far ahead (not reached yet)
     if (distancePastLayer < -3500) {
-      const fadeIn = Math.max(0.1, 1 - Math.abs(distancePastLayer + 3500) / 8000);
+      const fadeIn = Math.max(0.15, 1 - Math.abs(distancePastLayer + 3500) / 10000);
       return {
         opacity: fadeIn,
-        filter: `blur(${Math.min(6, Math.abs(distancePastLayer + 3500) / 1500)}px)`,
         pointerEvents: 'auto' as const,
       };
     }
@@ -269,7 +268,6 @@ function MultiplaneWorld() {
     if (distancePastLayer > 2500) {
       return {
         opacity: Math.max(0, 1 - (distancePastLayer - 2500) / 1500),
-        filter: 'none',
         pointerEvents: 'none' as const,
       };
     }
@@ -277,7 +275,6 @@ function MultiplaneWorld() {
     // Layer is in comfortable viewing range
     return {
       opacity: 1,
-      filter: 'none',
       pointerEvents: 'auto' as const,
     };
   };
@@ -324,12 +321,12 @@ function MultiplaneWorld() {
       {/* 3D World Container */}
       <div
         ref={worldRef}
-        className="absolute inset-0 world-3d"
+        className="absolute inset-0"
         style={{
           transformStyle: 'preserve-3d',
           // As scrollDepth increases, we push the world toward the viewer (positive Z)
           // This creates the effect of moving INTO the scene
-          transform: `translate3d(0, 0, ${scrollDepth}px)`,
+          transform: `translateZ(${scrollDepth}px)`,
         }}
       >
         {/* ============================================ */}
