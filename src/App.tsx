@@ -23,7 +23,7 @@ const LAYER_DEPTHS = {
 };
 
 const TOTAL_DEPTH = Math.abs(LAYER_DEPTHS.end);
-const SCROLL_MULTIPLIER = 3; // How much scroll affects depth (lower = faster)
+const SCROLL_MULTIPLIER = 8; // How much scroll affects depth
 
 // Earthy/warm color palette
 const colors = {
@@ -209,7 +209,7 @@ function MultiplaneWorld() {
   const currentDepth = useRef(0);
   const animationRef = useRef<number>(0);
 
-  const MAX_DEPTH = TOTAL_DEPTH + 1000; // Total scrollable depth
+  const MAX_DEPTH = TOTAL_DEPTH + 4000; // Total scrollable depth with buffer
 
   // Smooth animation
   useEffect(() => {
