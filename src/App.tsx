@@ -324,12 +324,12 @@ function MultiplaneWorld() {
       {/* 3D World Container */}
       <div
         ref={worldRef}
-        className="absolute inset-0"
+        className="absolute inset-0 world-3d"
         style={{
           transformStyle: 'preserve-3d',
           // As scrollDepth increases, we push the world toward the viewer (positive Z)
           // This creates the effect of moving INTO the scene
-          transform: `translateZ(${scrollDepth}px)`,
+          transform: `translate3d(0, 0, ${scrollDepth}px)`,
         }}
       >
         {/* ============================================ */}
@@ -406,7 +406,6 @@ function MultiplaneWorld() {
           shape="torn"
           className="right-[5%] top-[15%] w-[420px] h-[420px] overflow-hidden"
           style={{
-            backgroundColor: colors.bg,
             boxShadow: `
               0 50px 100px -20px rgba(0,0,0,0.8),
               0 30px 60px -10px rgba(0,0,0,0.5),
@@ -416,12 +415,9 @@ function MultiplaneWorld() {
           }}
         >
           <img
-            src="/images/3F61D426-E042-4B39-8379-951416C4F154.PNG"
+            src="/images/image.png"
             alt="Kona - Protogen character"
-            className="w-full h-full object-cover"
-            style={{
-              filter: 'invert(1) contrast(1.1) brightness(0.95)',
-            }}
+            className="w-full h-full object-contain"
           />
         </Plate>
 
