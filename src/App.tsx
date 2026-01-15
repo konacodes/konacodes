@@ -6,20 +6,20 @@ import "./index.css";
 // ============================================
 
 // Layer depth positions (higher = closer to camera, appears first when scrolling in)
-// 1.5x spacing for more separation between layers
+// Much wider spacing for dramatic depth separation
 const LAYER_DEPTHS = {
   opening: 0,
-  whoami: -1200,
-  philosophy: -2400,
-  whatimake: -3600,
-  duck: -4800,
-  platforms: -6000,
-  null: -7200,
-  lab: -8400,
-  art: -9600,
-  interests: -10800,
-  connect: -12000,
-  end: -13200,
+  whoami: -3500,
+  philosophy: -7000,
+  whatimake: -10500,
+  duck: -14000,
+  platforms: -17500,
+  null: -21000,
+  lab: -24500,
+  art: -28000,
+  interests: -31500,
+  connect: -35000,
+  end: -38500,
 };
 
 const TOTAL_DEPTH = Math.abs(LAYER_DEPTHS.end);
@@ -247,7 +247,7 @@ function MultiplaneWorld() {
   }, []);
 
   // Calculate visibility for each layer based on scroll depth
-  // Each layer has a depth value (0, -1200, -2400, etc.)
+  // Each layer has a depth value (0, -3500, -7000, etc.)
   // We convert to positive values for easier math
   const getLayerStyle = (depth: number) => {
     // Convert negative depth to positive distance from start
@@ -255,20 +255,20 @@ function MultiplaneWorld() {
     // How far past this layer have we scrolled?
     const distancePastLayer = scrollDepth - layerDistance;
 
-    // Layer is far ahead (not reached yet) - adjusted for 1.5x spacing
-    if (distancePastLayer < -1200) {
-      const fadeIn = Math.max(0.15, 1 - Math.abs(distancePastLayer + 1200) / 3000);
+    // Layer is far ahead (not reached yet) - adjusted for wider spacing
+    if (distancePastLayer < -3500) {
+      const fadeIn = Math.max(0.1, 1 - Math.abs(distancePastLayer + 3500) / 8000);
       return {
         opacity: fadeIn,
-        filter: `blur(${Math.min(4, Math.abs(distancePastLayer + 1200) / 600)}px)`,
+        filter: `blur(${Math.min(6, Math.abs(distancePastLayer + 3500) / 1500)}px)`,
         pointerEvents: 'auto' as const,
       };
     }
 
     // Layer is being passed through (close to camera)
-    if (distancePastLayer > 900) {
+    if (distancePastLayer > 2500) {
       return {
-        opacity: Math.max(0, 1 - (distancePastLayer - 900) / 500),
+        opacity: Math.max(0, 1 - (distancePastLayer - 2500) / 1500),
         filter: 'none',
         pointerEvents: 'none' as const,
       };
@@ -917,16 +917,16 @@ quack
 // ============================================
 function FloatingDecorations({ scrollDepth }: { scrollDepth: number }) {
   const decorations = [
-    { depth: -400, x: '85%', y: '20%', size: 60, color: colors.amber, shape: 'circle' },
-    { depth: -1200, x: '10%', y: '70%', size: 40, color: colors.sage, shape: 'circle' },
-    { depth: -2000, x: '75%', y: '60%', size: 80, color: colors.terracotta, shape: 'blob' },
-    { depth: -2800, x: '5%', y: '30%', size: 50, color: colors.warmGray, shape: 'circle' },
-    { depth: -3600, x: '90%', y: '80%', size: 70, color: colors.amber, shape: 'blob' },
-    { depth: -4400, x: '15%', y: '15%', size: 45, color: colors.sage, shape: 'circle' },
-    { depth: -5200, x: '80%', y: '45%', size: 55, color: colors.rust, shape: 'blob' },
-    { depth: -6000, x: '25%', y: '75%', size: 65, color: colors.terracotta, shape: 'circle' },
-    { depth: -6800, x: '70%', y: '25%', size: 35, color: colors.amber, shape: 'blob' },
-    { depth: -7600, x: '40%', y: '85%', size: 50, color: colors.sage, shape: 'circle' },
+    { depth: -1500, x: '85%', y: '20%', size: 60, color: colors.amber, shape: 'circle' },
+    { depth: -4500, x: '10%', y: '70%', size: 40, color: colors.sage, shape: 'circle' },
+    { depth: -8000, x: '75%', y: '60%', size: 80, color: colors.terracotta, shape: 'blob' },
+    { depth: -11500, x: '5%', y: '30%', size: 50, color: colors.warmGray, shape: 'circle' },
+    { depth: -15000, x: '90%', y: '80%', size: 70, color: colors.amber, shape: 'blob' },
+    { depth: -18500, x: '15%', y: '15%', size: 45, color: colors.sage, shape: 'circle' },
+    { depth: -22000, x: '80%', y: '45%', size: 55, color: colors.rust, shape: 'blob' },
+    { depth: -25500, x: '25%', y: '75%', size: 65, color: colors.terracotta, shape: 'circle' },
+    { depth: -29000, x: '70%', y: '25%', size: 35, color: colors.amber, shape: 'blob' },
+    { depth: -33000, x: '40%', y: '85%', size: 50, color: colors.sage, shape: 'circle' },
   ];
 
   return (
@@ -934,7 +934,7 @@ function FloatingDecorations({ scrollDepth }: { scrollDepth: number }) {
       {decorations.map((dec, i) => {
         const layerDistance = Math.abs(dec.depth);
         const distancePastLayer = scrollDepth - layerDistance;
-        const opacity = Math.max(0, Math.min(0.3, 1 - Math.abs(distancePastLayer) / 1500));
+        const opacity = Math.max(0, Math.min(0.3, 1 - Math.abs(distancePastLayer) / 5000));
 
         return (
           <div
