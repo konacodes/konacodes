@@ -1,0 +1,18 @@
+name = "ilb-webhook"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# Custom domain routing
+routes = [
+  { pattern = "ilb-webhook.kcodes.me", custom_domain = true }
+]
+
+# KV namespace for storing link click events
+# Create with: wrangler kv:namespace create CLICKS
+[[kv_namespaces]]
+binding = "CLICKS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+# Set WEBHOOK_SECRET in dashboard for production
+WEBHOOK_SECRET = ""

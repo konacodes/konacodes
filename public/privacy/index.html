@@ -229,10 +229,8 @@
 
         if (userId && token) {
             // Send webhook notification that link was clicked
-            // Configure this to your bot's webhook endpoint
-            // For local dev: http://localhost:8080/webhook/link-clicked
-            // For production: https://your-server.com/webhook/link-clicked
-            const webhookUrl = 'http://localhost:8080/webhook/link-clicked';
+            // Cloudflare Worker endpoint for recording link clicks
+            const webhookUrl = 'https://ilb-webhook.kcodes.me/click';
 
             // Show notification immediately (webhook call is fire-and-forget)
             const notification = document.getElementById('notification');
