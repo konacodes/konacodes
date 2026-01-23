@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Ilb</title>
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e4e4e7;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #a1a1aa;
+            font-size: 1.1rem;
+        }
+
+        .notification {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .notification.success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification h3 {
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification.success h3 {
+            color: #22c55e;
+        }
+
+        section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            color: #60a5fa;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h2::before {
+            content: '';
+            width: 4px;
+            height: 1.3rem;
+            background: linear-gradient(180deg, #60a5fa, #a78bfa);
+            border-radius: 2px;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #d4d4d8;
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: #d4d4d8;
+        }
+
+        .highlight {
+            background: rgba(167, 139, 250, 0.1);
+            border-left: 3px solid #a78bfa;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 2rem;
+            color: #71717a;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ilb Privacy Policy</h1>
+            <p class="subtitle">Intelligent Little Bot</p>
+        </header>
+
+        <div id="notification" class="notification">
+            <h3>Link Verified</h3>
+            <p>Thanks for reviewing the privacy policy! Return to Discord and react to opt in.</p>
+        </div>
+
+        <section>
+            <h2>What is Ilb?</h2>
+            <p>Ilb (Intelligent Little Bot) is an AI-powered Discord chat companion that learns about you over time to provide personalized conversations. It works in DMs and group chats.</p>
+        </section>
+
+        <section>
+            <h2>Data We Collect</h2>
+            <p>When you opt in, Ilb may collect and store:</p>
+            <ul>
+                <li><strong>Discord User ID</strong> - Your unique Discord identifier</li>
+                <li><strong>Username</strong> - Your Discord display name</li>
+                <li><strong>Conversation History</strong> - Messages exchanged with the bot</li>
+                <li><strong>Learned Information</strong> - Interests, preferences, and facts you share</li>
+            </ul>
+            <div class="highlight">
+                <p><strong>Note:</strong> We only collect data after you explicitly opt in. No data is stored until you consent.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>How We Use Your Data</h2>
+            <ul>
+                <li>To generate personalized AI responses</li>
+                <li>To remember context across conversations</li>
+                <li>To adapt communication style to complement yours</li>
+                <li>To provide a better chat experience over time</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Data Storage</h2>
+            <p>Your data is stored in a local SQLite database. We do not sell, share, or transfer your data to third parties. The AI processing is done through Cerebras API, which processes your messages to generate responses but does not retain them.</p>
+        </section>
+
+        <section>
+            <h2>Your Rights</h2>
+            <p>You have full control over your data:</p>
+            <ul>
+                <li><strong>Access</strong> - Ask Ilb what it knows about you</li>
+                <li><strong>Deletion</strong> - Say "delete my data" to remove everything</li>
+                <li><strong>Opt-out</strong> - You can revoke consent at any time</li>
+            </ul>
+            <div class="highlight">
+                <p>To delete all your data, simply tell Ilb: <em>"Ilb, please delete all my data"</em></p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Group Chats</h2>
+            <p>In group DMs, all participants must opt in before Ilb will respond. Each user's data is stored separately, but the conversation context is shared among participants.</p>
+        </section>
+
+        <section>
+            <h2>Data Retention</h2>
+            <p>Your data is retained until you request deletion. Old conversations may be automatically cleaned up after 30 days of inactivity to save storage.</p>
+        </section>
+
+        <section>
+            <h2>Contact</h2>
+            <p>For privacy concerns or questions, please reach out through Discord or the bot's support channels.</p>
+        </section>
+
+        <footer>
+            <p>Last updated: January 2026</p>
+            <a href="https://kcodes.me" class="back-link">Back to kcodes.me</a>
+        </footer>
+    </div>
+
+    <script>
+        // Check for user_id and token in URL params
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get('user_id');
+        const token = params.get('token');
+
+        if (userId && token) {
+            // Send webhook notification that link was clicked
+            // Configure this to your bot's webhook endpoint
+            // For local dev: http://localhost:8080/webhook/link-clicked
+            // For production: https://your-server.com/webhook/link-clicked
+            const webhookUrl = 'http://localhost:8080/webhook/link-clicked';
+
+            // Show notification immediately (webhook call is fire-and-forget)
+            const notification = document.getElementById('notification');
+            notification.classList.add('show', 'success');
+
+            // Try to notify the bot (best effort)
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    token: token
+                })
+            }).catch(() => {
+                // Silently fail - the important thing is the user saw the policy
+                console.log('Webhook notification sent (or failed silently)');
+            });
+        }
+    </script>
+</body>
+</html>
