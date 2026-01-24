@@ -53,14 +53,10 @@ export function renderHome(posts: Post[]): string {
         }
 
         .header h1 {
-          font-size: 2.5rem;
-          font-weight: 300;
+          font-family: var(--font-display);
+          font-size: 2.2rem;
+          font-weight: 400;
           margin-bottom: 0.5rem;
-        }
-
-        .header h1 span {
-          font-family: var(--font-mono);
-          color: var(--color-accent-light);
         }
 
         .header p {
@@ -111,7 +107,8 @@ export function renderHome(posts: Post[]): string {
         }
 
         .post-card h2 {
-          font-size: 1.4rem;
+          font-family: var(--font-display);
+          font-size: 1.3rem;
           font-weight: 400;
           color: var(--color-text);
           margin-bottom: 0.5rem;
@@ -119,7 +116,7 @@ export function renderHome(posts: Post[]): string {
         }
 
         .post-card a:hover h2 {
-          color: var(--color-accent-light);
+          color: var(--color-accent);
         }
 
         .post-card p {
@@ -170,7 +167,7 @@ export function renderHome(posts: Post[]): string {
         </a>
 
         <header class="header animate-in delay-1">
-          <h1><span>kona_</span>/blog</h1>
+          <h1>Blog</h1>
           <p>thoughts, projects, and random things</p>
         </header>
 
@@ -227,9 +224,10 @@ export function renderPost(post: Post, htmlContent: string): string {
         }
 
         .post-header h1 {
-          font-size: 2.5rem;
+          font-family: var(--font-display);
+          font-size: 2rem;
           font-weight: 400;
-          line-height: 1.2;
+          line-height: 1.3;
           margin-bottom: 1rem;
         }
 
@@ -303,8 +301,9 @@ export function render404(): string {
         }
 
         h1 {
-          font-size: 6rem;
-          font-weight: 300;
+          font-family: var(--font-display);
+          font-size: 4rem;
+          font-weight: 400;
           color: var(--color-accent);
           margin-bottom: 1rem;
         }

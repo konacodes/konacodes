@@ -1,18 +1,22 @@
 // Shared styles matching kcodes.me theme
 export const baseStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Rock+Salt&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
   :root {
-    --font-display: 'Space Grotesk', system-ui, sans-serif;
-    --font-serif: 'Crimson Pro', Georgia, serif;
+    --font-display: 'Rock Salt', cursive;
+    --font-sans: 'Space Grotesk', system-ui, sans-serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
     --font-mono: 'JetBrains Mono', monospace;
-    --color-bg: #030303;
-    --color-accent: #764ba2;
-    --color-accent-light: #f093fb;
-    --color-text: #fafafa;
-    --color-text-secondary: rgba(250, 250, 250, 0.6);
-    --color-text-muted: rgba(250, 250, 250, 0.3);
-    --color-border: rgba(255, 255, 255, 0.08);
+    --color-bg: #f8f5f0;
+    --color-ink: #1a1a18;
+    --color-ink-light: #4a4a45;
+    --color-ink-lighter: #8a8a82;
+    --color-accent: #c9a66b;
+    --color-rule: #d4d0c8;
+    --color-text: var(--color-ink);
+    --color-text-secondary: var(--color-ink-light);
+    --color-text-muted: var(--color-ink-lighter);
+    --color-border: var(--color-rule);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -29,35 +33,11 @@ export const baseStyles = `
   }
 
   body {
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     background: var(--color-bg);
     color: var(--color-text);
     min-height: 100vh;
     line-height: 1.6;
-  }
-
-  /* Mesh background */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(ellipse 80% 50% at 20% 40%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 80% at 80% 20%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 60% at 60% 80%, rgba(0, 150, 255, 0.08) 0%, transparent 50%),
-      linear-gradient(180deg, #030303 0%, #0a0512 50%, #030303 100%);
-  }
-
-  /* Noise overlay */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   }
 
   ::selection {
@@ -66,13 +46,13 @@ export const baseStyles = `
   }
 
   a {
-    color: var(--color-accent-light);
+    color: var(--color-ink);
     text-decoration: none;
     transition: color 0.2s ease;
   }
 
   a:hover {
-    color: var(--color-text);
+    color: var(--color-accent);
   }
 
   .container {
@@ -81,13 +61,6 @@ export const baseStyles = `
     padding: 2rem;
     position: relative;
     z-index: 1;
-  }
-
-  .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
   }
 
   /* Typography for blog content */
@@ -99,35 +72,41 @@ export const baseStyles = `
 
   .prose h1, .prose h2, .prose h3, .prose h4 {
     color: var(--color-text);
-    font-weight: 500;
+    font-family: var(--font-display);
+    font-weight: 400;
     margin: 2rem 0 1rem;
     line-height: 1.3;
   }
 
-  .prose h1 { font-size: 2.5rem; }
-  .prose h2 { font-size: 1.8rem; }
-  .prose h3 { font-size: 1.4rem; }
+  .prose h1 { font-size: 2rem; }
+  .prose h2 { font-size: 1.5rem; }
+  .prose h3 { font-size: 1.2rem; }
 
   .prose p {
     margin-bottom: 1.5rem;
   }
 
   .prose a {
-    color: var(--color-accent-light);
+    color: var(--color-accent);
     text-decoration: underline;
     text-underline-offset: 3px;
   }
 
+  .prose a:hover {
+    color: var(--color-ink);
+  }
+
   .prose code {
     font-family: var(--font-mono);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.05);
     padding: 0.2em 0.4em;
     border-radius: 4px;
     font-size: 0.9em;
   }
 
   .prose pre {
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-ink);
+    color: #f8f5f0;
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 1.5rem;
@@ -140,6 +119,7 @@ export const baseStyles = `
     padding: 0;
     font-size: 0.9rem;
     line-height: 1.6;
+    color: inherit;
   }
 
   .prose blockquote {
@@ -147,6 +127,7 @@ export const baseStyles = `
     padding-left: 1.5rem;
     margin: 1.5rem 0;
     font-style: italic;
+    font-family: var(--font-serif);
     color: var(--color-text-muted);
   }
 
@@ -178,7 +159,7 @@ export const baseStyles = `
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
@@ -193,8 +174,8 @@ export const baseStyles = `
   }
 
   .btn-primary:hover {
-    background: var(--color-accent-light);
-    color: #030303;
+    background: var(--color-ink);
+    color: var(--color-bg);
   }
 
   .btn-ghost {
@@ -204,31 +185,31 @@ export const baseStyles = `
   }
 
   .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.03);
     color: var(--color-text);
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--color-ink-lighter);
   }
 
   .btn-danger {
     background: transparent;
-    color: #f5576c;
-    border: 1px solid rgba(245, 87, 108, 0.3);
+    color: #c44;
+    border: 1px solid rgba(204, 68, 68, 0.3);
   }
 
   .btn-danger:hover {
-    background: rgba(245, 87, 108, 0.1);
-    border-color: #f5576c;
+    background: rgba(204, 68, 68, 0.1);
+    border-color: #c44;
   }
 
   /* Form elements */
   input, textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: white;
     border: 1px solid var(--color-border);
     border-radius: 8px;
     color: var(--color-text);
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     font-size: 1rem;
     transition: border-color 0.2s ease;
   }
@@ -269,6 +250,6 @@ export const baseStyles = `
 export const baseHead = `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✍️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>K</text></svg>">
   <style>${baseStyles}</style>
 `;
