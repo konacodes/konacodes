@@ -193,6 +193,166 @@ function TimeDisplay() {
 }
 
 // ============================================
+// Now Page
+// ============================================
+function NowPage() {
+  return (
+    <div className="page">
+      <Spotlight />
+      <ThemeToggle />
+
+      <header className="subpage-header">
+        <a href="/" className="back-link">← Back</a>
+        <h1 className="subpage-title">Now</h1>
+        <p className="subpage-subtitle">What I'm up to these days</p>
+        <time className="last-updated">Last updated: January 2025</time>
+      </header>
+
+      <main className="now-content">
+        <section className="now-section">
+          <h2 className="now-heading">Working on</h2>
+          <ul className="now-list">
+            <li>Building out this portfolio site</li>
+            <li>Duck Lang — a programming language where you say "quack"</li>
+            <li>Various Cloudflare Workers experiments</li>
+          </ul>
+        </section>
+
+        <section className="now-section">
+          <h2 className="now-heading">Watching</h2>
+          <ul className="now-list">
+            <li>Rewatching old films for the catalog</li>
+            <li>Whatever catches my eye on Letterboxd</li>
+          </ul>
+        </section>
+
+        <section className="now-section">
+          <h2 className="now-heading">Listening to</h2>
+          <ul className="now-list">
+            <li>A lot of ambient and electronic stuff</li>
+            <li>Podcast backlog that never shrinks</li>
+          </ul>
+        </section>
+
+        <section className="now-section">
+          <h2 className="now-heading">Reading</h2>
+          <ul className="now-list">
+            <li>Technical docs, always</li>
+            <li>History books when I get the chance</li>
+          </ul>
+        </section>
+
+        <p className="now-note">
+          This is a <a href="https://nownownow.com/about" target="_blank" rel="noopener noreferrer">/now page</a>.
+          You should make one too.
+        </p>
+      </main>
+
+      <footer className="footer">
+        <div className="footer-rule" />
+        <p className="footer-text">
+          <span className="footer-year">{new Date().getFullYear()}</span>
+          <span className="footer-divider">·</span>
+          <span>Made with questionable sleep habits</span>
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+// ============================================
+// Uses Page
+// ============================================
+function UsesPage() {
+  const categories = [
+    {
+      title: 'Editor & Terminal',
+      items: [
+        { name: 'VS Code', note: 'with vim keybindings' },
+        { name: 'Cursor', note: 'for AI-assisted coding' },
+        { name: 'iTerm2', note: 'with tmux' },
+        { name: 'zsh', note: 'with oh-my-zsh' },
+      ]
+    },
+    {
+      title: 'Dev Tools',
+      items: [
+        { name: 'Bun', note: 'faster than Node, no regrets' },
+        { name: 'Git', note: 'obviously' },
+        { name: 'GitHub', note: 'for everything' },
+        { name: 'Cloudflare', note: 'Workers, D1, Pages' },
+      ]
+    },
+    {
+      title: 'Languages',
+      items: [
+        { name: 'TypeScript', note: 'daily driver' },
+        { name: 'Rust', note: 'for fun and systems stuff' },
+        { name: 'Python', note: 'when I need it' },
+      ]
+    },
+    {
+      title: 'Apps',
+      items: [
+        { name: 'Arc', note: 'browser of choice' },
+        { name: 'Raycast', note: 'replaced Spotlight entirely' },
+        { name: 'Discord', note: 'always open' },
+        { name: 'Notion', note: 'for notes and planning' },
+      ]
+    },
+    {
+      title: 'Hardware',
+      items: [
+        { name: 'MacBook Pro', note: 'M-series' },
+        { name: 'Mechanical keyboard', note: 'clicky sounds are essential' },
+      ]
+    },
+  ];
+
+  return (
+    <div className="page">
+      <Spotlight />
+      <ThemeToggle />
+
+      <header className="subpage-header">
+        <a href="/" className="back-link">← Back</a>
+        <h1 className="subpage-title">Uses</h1>
+        <p className="subpage-subtitle">Tools, software, and setup</p>
+      </header>
+
+      <main className="uses-content">
+        {categories.map((category) => (
+          <section key={category.title} className="uses-section">
+            <h2 className="uses-heading">{category.title}</h2>
+            <ul className="uses-list">
+              {category.items.map((item) => (
+                <li key={item.name} className="uses-item">
+                  <span className="uses-name">{item.name}</span>
+                  {item.note && <span className="uses-note">— {item.note}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+
+        <p className="uses-note-footer">
+          Inspired by <a href="https://uses.tech" target="_blank" rel="noopener noreferrer">uses.tech</a>
+        </p>
+      </main>
+
+      <footer className="footer">
+        <div className="footer-rule" />
+        <p className="footer-text">
+          <span className="footer-year">{new Date().getFullYear()}</span>
+          <span className="footer-divider">·</span>
+          <span>Made with questionable sleep habits</span>
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+// ============================================
 // Labs Page
 // ============================================
 function LabsPage() {
@@ -320,6 +480,11 @@ function HomePage() {
     { name: 'Email', href: 'mailto:hello@kcodes.me' },
   ];
 
+  const pages = [
+    { name: 'Now', href: '/now' },
+    { name: 'Uses', href: '/uses' },
+  ];
+
   return (
     <div className="page">
       <Spotlight />
@@ -367,6 +532,19 @@ function HomePage() {
             <p className="sidebar-text italic">
               "Ship it raw. Done &gt; perfect."
             </p>
+          </div>
+
+          <div className="sidebar-section">
+            <h3 className="sidebar-heading">More</h3>
+            <ul className="sidebar-links">
+              {pages.map((page) => (
+                <li key={page.name}>
+                  <a href={page.href} className="sidebar-link">
+                    {page.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div className="sidebar-section">
@@ -421,7 +599,7 @@ function useRoute() {
       if (anchor && anchor.href.startsWith(window.location.origin)) {
         const url = new URL(anchor.href);
         // Only handle internal non-blog/films routes
-        if (url.pathname === '/' || url.pathname === '/labs') {
+        if (url.pathname === '/' || url.pathname === '/labs' || url.pathname === '/now' || url.pathname === '/uses') {
           e.preventDefault();
           window.history.pushState({}, '', url.pathname);
           setPath(url.pathname);
@@ -443,9 +621,18 @@ function useRoute() {
 export function App() {
   const path = useRoute();
 
+  const renderPage = () => {
+    switch (path) {
+      case '/labs': return <LabsPage />;
+      case '/now': return <NowPage />;
+      case '/uses': return <UsesPage />;
+      default: return <HomePage />;
+    }
+  };
+
   return (
     <ThemeProvider>
-      {path === '/labs' ? <LabsPage /> : <HomePage />}
+      {renderPage()}
     </ThemeProvider>
   );
 }
