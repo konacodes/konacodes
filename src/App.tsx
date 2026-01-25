@@ -1,5 +1,127 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, createContext, useContext, useCallback } from "react";
 import "./index.css";
+
+// ============================================
+// Theme Context
+// ============================================
+type Theme = 'light' | 'dark';
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: (e: React.MouseEvent) => void;
+  isAnimating: boolean;
+}
+
+const ThemeContext = createContext<ThemeContextType | null>(null);
+
+function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error('useTheme must be used within ThemeProvider');
+  return context;
+}
+
+function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme') as Theme;
+      if (stored) return stored;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  });
+
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [splashOrigin, setSplashOrigin] = useState({ x: 0, y: 0 });
+  const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback((e: React.MouseEvent) => {
+    if (isAnimating) return;
+
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+
+    setSplashOrigin({ x, y });
+    setPendingTheme(theme === 'light' ? 'dark' : 'light');
+    setIsAnimating(true);
+  }, [theme, isAnimating]);
+
+  // Handle animation completion
+  useEffect(() => {
+    if (isAnimating && pendingTheme) {
+      const timer = setTimeout(() => {
+        setTheme(pendingTheme);
+        setPendingTheme(null);
+
+        // Small delay before removing animation state
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 50);
+      }, 600); // Match CSS animation duration
+
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating, pendingTheme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme, isAnimating }}>
+      {children}
+      {/* Splash overlay for theme transition */}
+      {isAnimating && pendingTheme && (
+        <div
+          className={`theme-splash theme-splash-${pendingTheme}`}
+          style={{
+            '--splash-x': `${splashOrigin.x}px`,
+            '--splash-y': `${splashOrigin.y}px`,
+          } as React.CSSProperties}
+        />
+      )}
+    </ThemeContext.Provider>
+  );
+}
+
+// ============================================
+// Theme Toggle Button
+// ============================================
+function ThemeToggle() {
+  const { theme, toggleTheme, isAnimating } = useTheme();
+
+  return (
+    <button
+      className={`theme-toggle ${isAnimating ? 'animating' : ''}`}
+      onClick={toggleTheme}
+      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      disabled={isAnimating}
+    >
+      <span className="theme-toggle-icon">
+        {theme === 'light' ? (
+          // Moon icon
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        ) : (
+          // Sun icon
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        )}
+      </span>
+    </button>
+  );
+}
 
 // ============================================
 // Spotlight Effect - The Signature Element
@@ -121,6 +243,7 @@ function LabsPage() {
   return (
     <div className="page">
       <Spotlight />
+      <ThemeToggle />
 
       <header className="labs-header">
         <a href="/" className="back-link">← Back</a>
@@ -201,6 +324,7 @@ function HomePage() {
   return (
     <div className="page">
       <Spotlight />
+      <ThemeToggle />
 
       <header className="masthead">
         <div className="masthead-rule" />
@@ -320,11 +444,11 @@ function useRoute() {
 export function App() {
   const path = useRoute();
 
-  if (path === '/labs') {
-    return <LabsPage />;
-  }
-
-  return <HomePage />;
+  return (
+    <ThemeProvider>
+      {path === '/labs' ? <LabsPage /> : <HomePage />}
+    </ThemeProvider>
+  );
 }
 
 export default App;

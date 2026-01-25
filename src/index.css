@@ -31,6 +31,37 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Dark Theme - rich, warm darkness */
+[data-theme="dark"] {
+  --color-paper: #0f0e0d;
+  --color-ink: #e8e4df;
+  --color-ink-light: #b8b4ae;
+  --color-ink-lighter: #7a766f;
+  --color-rule: #2a2826;
+  --color-accent: #d4b078;
+  --color-spotlight: rgba(212, 176, 120, 0.08);
+}
+
+[data-theme="dark"] body {
+  background: var(--color-paper);
+}
+
+[data-theme="dark"] .tech-tag {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .project-card:hover {
+  background: rgba(212, 176, 120, 0.05);
+}
+
+[data-theme="dark"] .page::before {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+}
+
 /* ============================================
    Base
    ============================================ */
@@ -449,6 +480,81 @@ body {
 }
 
 /* ============================================
+   Theme Toggle
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 100;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-rule);
+  border-radius: 50%;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s var(--ease-out);
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  transform: scale(1.05);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle.animating {
+  pointer-events: none;
+}
+
+.theme-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.theme-toggle:hover .theme-toggle-icon {
+  transform: rotate(15deg);
+}
+
+/* ============================================
+   Theme Splash Animation
+   ============================================ */
+.theme-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  clip-path: circle(0% at var(--splash-x) var(--splash-y));
+  animation: splashReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.theme-splash-dark {
+  background: #0f0e0d;
+}
+
+.theme-splash-light {
+  background: #f8f5f0;
+}
+
+@keyframes splashReveal {
+  0% {
+    clip-path: circle(0% at var(--splash-x) var(--splash-y));
+  }
+  100% {
+    clip-path: circle(150% at var(--splash-x) var(--splash-y));
+  }
+}
+
+/* ============================================
    Animations
    ============================================ */
 @keyframes fadeSlideUp {
@@ -474,6 +580,11 @@ body {
 
   .spotlight {
     display: none;
+  }
+
+  .theme-splash {
+    animation: none;
+    clip-path: circle(150% at var(--splash-x) var(--splash-y));
   }
 }
 
