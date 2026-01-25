@@ -1,4 +1,4 @@
-import { baseHead } from './styles';
+import { baseHead, themeToggleHTML } from './styles';
 
 interface Post {
   id: string;
@@ -158,6 +158,7 @@ export function renderHome(posts: Post[]): string {
       </style>
     </head>
     <body>
+      ${themeToggleHTML}
       <div class="container">
         <a href="https://kcodes.me" class="back-link animate-in">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -254,6 +255,7 @@ export function renderPost(post: Post, htmlContent: string): string {
       </style>
     </head>
     <body>
+      ${themeToggleHTML}
       <div class="container">
         <a href="/" class="back-link animate-in">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -315,6 +317,7 @@ export function render404(): string {
       </style>
     </head>
     <body>
+      ${themeToggleHTML}
       <div class="container">
         <h1 class="animate-in">404</h1>
         <p class="animate-in delay-1">couldn't find that one</p>

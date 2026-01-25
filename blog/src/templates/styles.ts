@@ -12,12 +12,27 @@ export const baseStyles = `
     --color-ink-light: #4a4a45;
     --color-ink-lighter: #8a8a82;
     --color-accent: #c9a66b;
+    --color-accent-light: #d4b078;
     --color-rule: #d4d0c8;
     --color-text: var(--color-ink);
     --color-text-secondary: var(--color-ink-light);
     --color-text-muted: var(--color-ink-lighter);
     --color-border: var(--color-rule);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-theme="dark"] {
+    --color-bg: #0f0e0d;
+    --color-ink: #e8e4df;
+    --color-ink-light: #b8b4ae;
+    --color-ink-lighter: #7a766f;
+    --color-accent: #d4b078;
+    --color-accent-light: #e0c090;
+    --color-rule: #2a2826;
+    --color-text: var(--color-ink);
+    --color-text-secondary: var(--color-ink-light);
+    --color-text-muted: var(--color-ink-lighter);
+    --color-border: var(--color-rule);
   }
 
   * {
@@ -232,6 +247,71 @@ export const baseStyles = `
     font-size: 0.9rem;
   }
 
+  /* Theme Toggle */
+  .theme-toggle {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 100;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s var(--ease-out-expo);
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: scale(1.05);
+  }
+
+  .theme-toggle:active {
+    transform: scale(0.95);
+  }
+
+  .theme-toggle.animating {
+    pointer-events: none;
+  }
+
+  .theme-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Theme Splash Animation */
+  .theme-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    pointer-events: none;
+    clip-path: circle(0% at var(--splash-x) var(--splash-y));
+    animation: splashReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .theme-splash-dark {
+    background: #0f0e0d;
+  }
+
+  .theme-splash-light {
+    background: #f8f5f0;
+  }
+
+  @keyframes splashReveal {
+    0% {
+      clip-path: circle(0% at var(--splash-x) var(--splash-y));
+    }
+    100% {
+      clip-path: circle(150% at var(--splash-x) var(--splash-y));
+    }
+  }
+
   /* Animations */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
@@ -245,11 +325,100 @@ export const baseStyles = `
   .delay-1 { animation-delay: 0.1s; opacity: 0; }
   .delay-2 { animation-delay: 0.2s; opacity: 0; }
   .delay-3 { animation-delay: 0.3s; opacity: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-splash {
+      animation: none;
+      clip-path: circle(150% at var(--splash-x) var(--splash-y));
+    }
+  }
+`;
+
+export const themeScript = `
+  <script>
+    (function() {
+      const stored = localStorage.getItem('theme');
+      const theme = stored || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+`;
+
+export const themeToggleHTML = `
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+    <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  </button>
+  <div id="theme-splash"></div>
+  <script>
+    (function() {
+      const toggle = document.getElementById('theme-toggle');
+      const splash = document.getElementById('theme-splash');
+      const sunIcon = toggle.querySelector('.sun-icon');
+      const moonIcon = toggle.querySelector('.moon-icon');
+      let isAnimating = false;
+
+      function updateIcons() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'dark') {
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+        } else {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+        }
+      }
+
+      updateIcons();
+
+      toggle.addEventListener('click', function(e) {
+        if (isAnimating) return;
+        isAnimating = true;
+        toggle.classList.add('animating');
+
+        const rect = toggle.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+        splash.className = 'theme-splash theme-splash-' + newTheme;
+        splash.style.setProperty('--splash-x', x + 'px');
+        splash.style.setProperty('--splash-y', y + 'px');
+
+        setTimeout(function() {
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+          updateIcons();
+
+          setTimeout(function() {
+            splash.className = '';
+            isAnimating = false;
+            toggle.classList.remove('animating');
+          }, 50);
+        }, 600);
+      });
+    })();
+  </script>
 `;
 
 export const baseHead = `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>K</text></svg>">
+  ${themeScript}
   <style>${baseStyles}</style>
 `;
