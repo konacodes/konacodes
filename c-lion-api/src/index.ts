@@ -106,18 +106,22 @@ export default {
     }
 
     // API info endpoint
-    if (path === "/" || path === "/api" || path === "/api/service") {
+    if (path === "/") {
       return handleCors(
         new Response(
           JSON.stringify({
-            name: "C-Lion API",
+            name: "kcodes API",
             version: "1.0.0",
-            description: "A silly API for sea lion facts and memes",
-            endpoints: {
-              "/api/service/c-lion/v1/fact": "Get a random sea lion fact",
-              "/api/service/c-lion/v1/image": "Get a random sea lion image URL",
-              "/api/service/c-lion/v1/meme": "Get a meme (SVG with fact overlay)",
-              "/api/service/c-lion/v1/facts": "Get all sea lion facts",
+            services: {
+              "c-lion": {
+                description: "A silly API for sea lion facts and memes",
+                endpoints: {
+                  "/c-lion/v1/fact": "Get a random sea lion fact",
+                  "/c-lion/v1/image": "Get a random sea lion image URL",
+                  "/c-lion/v1/meme": "Get a meme (SVG with fact overlay)",
+                  "/c-lion/v1/facts": "Get all sea lion facts",
+                },
+              },
             },
           }),
           {
@@ -127,8 +131,8 @@ export default {
       );
     }
 
-    // C-Lion API v1 routes
-    if (path === "/api/service/c-lion/v1/fact") {
+    // C-Lion v1 routes
+    if (path === "/c-lion/v1/fact") {
       return handleCors(
         new Response(
           JSON.stringify({
@@ -142,7 +146,7 @@ export default {
       );
     }
 
-    if (path === "/api/service/c-lion/v1/facts") {
+    if (path === "/c-lion/v1/facts") {
       return handleCors(
         new Response(
           JSON.stringify({
@@ -157,7 +161,7 @@ export default {
       );
     }
 
-    if (path === "/api/service/c-lion/v1/image") {
+    if (path === "/c-lion/v1/image") {
       const imageUrl = getRandomImage();
       return handleCors(
         new Response(
@@ -172,7 +176,7 @@ export default {
       );
     }
 
-    if (path === "/api/service/c-lion/v1/meme") {
+    if (path === "/c-lion/v1/meme") {
       return handleCors(await generateMeme());
     }
 
@@ -183,10 +187,10 @@ export default {
           error: "Not Found",
           message: `Unknown endpoint: ${path}`,
           availableEndpoints: [
-            "/api/service/c-lion/v1/fact",
-            "/api/service/c-lion/v1/image",
-            "/api/service/c-lion/v1/meme",
-            "/api/service/c-lion/v1/facts",
+            "/c-lion/v1/fact",
+            "/c-lion/v1/image",
+            "/c-lion/v1/meme",
+            "/c-lion/v1/facts",
           ],
         }),
         {
