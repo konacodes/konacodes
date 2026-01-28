@@ -1,5 +1,9 @@
 import { getRandomFact, SEA_LION_FACTS } from "./facts";
 
+interface Env {
+  CEREBRAS_API_KEY: string;
+}
+
 const SEA_LION_IMAGES = [
   "https://upload.wikimedia.org/wikipedia/commons/f/f5/Sea_lion_family.JPG",
   "https://upload.wikimedia.org/wikipedia/commons/4/4c/Sealion052006.JPG",
@@ -12,6 +16,12 @@ const SEA_LION_IMAGES = [
   "https://upload.wikimedia.org/wikipedia/commons/3/33/California_Sea_Lion%2C_Pillar_Point_Harbor%2C_CA%2C_US_imported_from_iNaturalist_photo_171254002_%28cropped%29.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/1/1e/California_Sea_Lion%2C_San_Pedro%2C_Los_Angeles%2C_CA%2C_USA_imported_from_iNaturalist_photo_177215839.jpg",
 ];
+
+const SYSTEM_PROMPTS = {
+  corporate: `You are a corporate buzzword translator. Transform any message into maximum corporate speak while keeping it coherent and roughly conveying the same meaning. Use phrases like "synergize", "leverage", "circle back", "move the needle", "low-hanging fruit", "bandwidth", "deep dive", "align", "pivot", "ecosystem", "stakeholders", "value-add", "actionable insights", "paradigm shift", "scalable solutions", "cross-functional", "deliverables", "KPIs", "ROI", "optimize", "streamline". Make it sound like it came from a middle manager who just attended a leadership seminar. Keep it coherent but maximally corporate. Only output the translated text, nothing else.`,
+
+  legal: `You are a legal jargon translator. Transform any message into dense legalese while keeping it coherent and roughly conveying the same meaning. Use phrases like "hereinafter referred to as", "notwithstanding the foregoing", "pursuant to", "in accordance with", "shall be deemed", "subject to the provisions", "without limitation", "including but not limited to", "to the fullest extent permitted by law", "in witness whereof", "whereas", "hereby", "therein", "thereof", "heretofore", "aforementioned". Add disclaimers, qualifications, and nested clauses. Make it sound like a contract written by an overzealous attorney billing by the word. Keep it coherent but maximally legal. Only output the translated text, nothing else.`,
+};
 
 function getRandomImage(): string {
   return SEA_LION_IMAGES[Math.floor(Math.random() * SEA_LION_IMAGES.length)];
@@ -90,10 +100,72 @@ async function generateMeme(): Promise<Response> {
   });
 }
 
+async function callCerebras(
+  apiKey: string,
+  systemPrompt: string,
+  userText: string
+): Promise<string> {
+  const response = await fetch("https://api.cerebras.ai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "llama3.1-8b",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userText },
+      ],
+      max_tokens: 1024,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Cerebras API error: ${response.status} - ${error}`);
+  }
+
+  const data = (await response.json()) as {
+    choices: Array<{ message: { content: string } }>;
+  };
+  return data.choices[0].message.content;
+}
+
+async function getTextFromRequest(request: Request, url: URL): Promise<string | null> {
+  // Try query param first (for GET)
+  const textParam = url.searchParams.get("text");
+  if (textParam) {
+    return textParam;
+  }
+
+  // For POST, try to parse body
+  if (request.method === "POST") {
+    const contentType = request.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      const body = (await request.json()) as { text?: string };
+      return body.text || null;
+    }
+
+    if (contentType.includes("text/plain")) {
+      return await request.text();
+    }
+
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      const formData = await request.formData();
+      return formData.get("text") as string | null;
+    }
+  }
+
+  return null;
+}
+
 function handleCors(response: Response): Response {
   const headers = new Headers(response.headers);
   headers.set("Access-Control-Allow-Origin", "*");
-  headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   headers.set("Access-Control-Allow-Headers", "Content-Type");
   return new Response(response.body, {
     status: response.status,
@@ -102,8 +174,15 @@ function handleCors(response: Response): Response {
   });
 }
 
+function jsonResponse(data: object, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -114,71 +193,62 @@ export default {
     // API info endpoint
     if (path === "/") {
       return handleCors(
-        new Response(
-          JSON.stringify({
-            name: "kcodes API",
-            version: "1.0.0",
-            services: {
-              "c-lion": {
-                description: "A silly API for sea lion facts and memes",
-                endpoints: {
-                  "/c-lion/v1/fact": "Get a random sea lion fact",
-                  "/c-lion/v1/image": "Get a random sea lion image URL",
-                  "/c-lion/v1/meme": "Get a meme (SVG with fact overlay)",
-                  "/c-lion/v1/facts": "Get all sea lion facts",
-                },
+        jsonResponse({
+          name: "kcodes API",
+          version: "1.0.0",
+          services: {
+            "c-lion": {
+              description: "A silly API for sea lion facts and memes",
+              endpoints: {
+                "GET /c-lion/v1/fact": "Get a random sea lion fact",
+                "GET /c-lion/v1/image": "Get a random sea lion image URL",
+                "GET /c-lion/v1/meme": "Get a meme (SVG with fact overlay)",
+                "GET /c-lion/v1/facts": "Get all sea lion facts",
               },
             },
-          }),
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        )
+            jargon: {
+              description: "Transform text into corporate or legal jargon",
+              endpoints: {
+                "GET|POST /jargon/v1/corporate": "Transform text into corporate buzzwords",
+                "GET|POST /jargon/v1/legal": "Transform text into dense legalese",
+              },
+              usage: {
+                GET: "/jargon/v1/corporate?text=your message here",
+                POST: "Body: { \"text\": \"your message here\" } or plain text",
+              },
+            },
+          },
+        })
       );
     }
 
-    // C-Lion v1 routes
+    // ============ C-Lion v1 routes ============
     if (path === "/c-lion/v1/fact") {
       return handleCors(
-        new Response(
-          JSON.stringify({
-            fact: getRandomFact(),
-            source: "C-Lion API v1",
-          }),
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        )
+        jsonResponse({
+          fact: getRandomFact(),
+          source: "C-Lion API v1",
+        })
       );
     }
 
     if (path === "/c-lion/v1/facts") {
       return handleCors(
-        new Response(
-          JSON.stringify({
-            facts: SEA_LION_FACTS,
-            count: SEA_LION_FACTS.length,
-            source: "C-Lion API v1",
-          }),
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        )
+        jsonResponse({
+          facts: SEA_LION_FACTS,
+          count: SEA_LION_FACTS.length,
+          source: "C-Lion API v1",
+        })
       );
     }
 
     if (path === "/c-lion/v1/image") {
       const imageUrl = getRandomImage();
       return handleCors(
-        new Response(
-          JSON.stringify({
-            url: imageUrl,
-            source: "C-Lion API v1",
-          }),
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        )
+        jsonResponse({
+          url: imageUrl,
+          source: "C-Lion API v1",
+        })
       );
     }
 
@@ -186,10 +256,72 @@ export default {
       return handleCors(await generateMeme());
     }
 
+    // ============ Jargon v1 routes ============
+    if (path === "/jargon/v1/corporate" || path === "/jargon/v1/legal") {
+      const jargonType = path.includes("corporate") ? "corporate" : "legal";
+
+      if (request.method !== "GET" && request.method !== "POST") {
+        return handleCors(
+          jsonResponse({ error: "Method not allowed. Use GET or POST." }, 405)
+        );
+      }
+
+      const text = await getTextFromRequest(request, url);
+
+      if (!text || text.trim().length === 0) {
+        return handleCors(
+          jsonResponse(
+            {
+              error: "Missing text parameter",
+              usage: {
+                GET: `/jargon/v1/${jargonType}?text=your message here`,
+                POST: `Body: { "text": "your message here" } or Content-Type: text/plain`,
+              },
+            },
+            400
+          )
+        );
+      }
+
+      if (text.length > 2000) {
+        return handleCors(
+          jsonResponse({ error: "Text too long. Maximum 2000 characters." }, 400)
+        );
+      }
+
+      if (!env.CEREBRAS_API_KEY) {
+        return handleCors(
+          jsonResponse({ error: "Service not configured (missing API key)" }, 503)
+        );
+      }
+
+      try {
+        const result = await callCerebras(
+          env.CEREBRAS_API_KEY,
+          SYSTEM_PROMPTS[jargonType],
+          text
+        );
+
+        return handleCors(
+          jsonResponse({
+            original: text,
+            jargonified: result,
+            type: jargonType,
+            source: "Jargon API v1",
+          })
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        return handleCors(
+          jsonResponse({ error: "Failed to process text", details: message }, 500)
+        );
+      }
+    }
+
     // 404 for unknown routes
     return handleCors(
-      new Response(
-        JSON.stringify({
+      jsonResponse(
+        {
           error: "Not Found",
           message: `Unknown endpoint: ${path}`,
           availableEndpoints: [
@@ -197,12 +329,11 @@ export default {
             "/c-lion/v1/image",
             "/c-lion/v1/meme",
             "/c-lion/v1/facts",
+            "/jargon/v1/corporate",
+            "/jargon/v1/legal",
           ],
-        }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
+        },
+        404
       )
     );
   },
