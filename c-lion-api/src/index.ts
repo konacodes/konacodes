@@ -2,6 +2,83 @@ import { getRandomFact, SEA_LION_FACTS } from "./facts";
 
 interface Env {
   CEREBRAS_API_KEY: string;
+  RATE_LIMITS: KVNamespace;
+}
+
+// Rate limit config
+const RATE_LIMITS = {
+  perMinute: { max: 10, windowSecs: 60 },
+  perDay: { max: 100, windowSecs: 86400 },
+};
+
+interface RateLimitData {
+  count: number;
+  resetAt: number;
+}
+
+async function checkRateLimit(
+  kv: KVNamespace,
+  ip: string
+): Promise<{ allowed: boolean; retryAfter?: number; remaining?: { minute: number; day: number } }> {
+  const now = Date.now();
+  const minuteKey = `rl:min:${ip}`;
+  const dayKey = `rl:day:${ip}`;
+
+  // Check minute limit
+  const minuteData = await kv.get<RateLimitData>(minuteKey, "json");
+  let minuteCount = 0;
+  if (minuteData && minuteData.resetAt > now) {
+    minuteCount = minuteData.count;
+    if (minuteCount >= RATE_LIMITS.perMinute.max) {
+      return {
+        allowed: false,
+        retryAfter: Math.ceil((minuteData.resetAt - now) / 1000),
+      };
+    }
+  }
+
+  // Check daily limit
+  const dayData = await kv.get<RateLimitData>(dayKey, "json");
+  let dayCount = 0;
+  if (dayData && dayData.resetAt > now) {
+    dayCount = dayData.count;
+    if (dayCount >= RATE_LIMITS.perDay.max) {
+      return {
+        allowed: false,
+        retryAfter: Math.ceil((dayData.resetAt - now) / 1000),
+      };
+    }
+  }
+
+  // Increment counters
+  const newMinuteData: RateLimitData = {
+    count: minuteCount + 1,
+    resetAt: minuteData && minuteData.resetAt > now ? minuteData.resetAt : now + RATE_LIMITS.perMinute.windowSecs * 1000,
+  };
+  const newDayData: RateLimitData = {
+    count: dayCount + 1,
+    resetAt: dayData && dayData.resetAt > now ? dayData.resetAt : now + RATE_LIMITS.perDay.windowSecs * 1000,
+  };
+
+  // Write both (non-blocking)
+  await Promise.all([
+    kv.put(minuteKey, JSON.stringify(newMinuteData), { expirationTtl: RATE_LIMITS.perMinute.windowSecs + 10 }),
+    kv.put(dayKey, JSON.stringify(newDayData), { expirationTtl: RATE_LIMITS.perDay.windowSecs + 10 }),
+  ]);
+
+  return {
+    allowed: true,
+    remaining: {
+      minute: RATE_LIMITS.perMinute.max - newMinuteData.count,
+      day: RATE_LIMITS.perDay.max - newDayData.count,
+    },
+  };
+}
+
+function getClientIP(request: Request): string {
+  return request.headers.get("cf-connecting-ip") ||
+         request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+         "unknown";
 }
 
 const SEA_LION_IMAGES = [
@@ -266,6 +343,28 @@ export default {
         );
       }
 
+      // Rate limiting
+      const clientIP = getClientIP(request);
+      const rateLimit = await checkRateLimit(env.RATE_LIMITS, clientIP);
+
+      if (!rateLimit.allowed) {
+        const response = jsonResponse(
+          {
+            error: "Rate limit exceeded",
+            message: "Too many requests. Please try again later.",
+            retryAfter: rateLimit.retryAfter,
+            limits: {
+              perMinute: RATE_LIMITS.perMinute.max,
+              perDay: RATE_LIMITS.perDay.max,
+            },
+          },
+          429
+        );
+        const headers = new Headers(response.headers);
+        headers.set("Retry-After", String(rateLimit.retryAfter));
+        return handleCors(new Response(response.body, { status: 429, headers }));
+      }
+
       const text = await getTextFromRequest(request, url);
 
       if (!text || text.trim().length === 0) {
@@ -302,14 +401,20 @@ export default {
           text
         );
 
-        return handleCors(
-          jsonResponse({
-            original: text,
-            jargonified: result,
-            type: jargonType,
-            source: "Jargon API v1",
-          })
-        );
+        const response = jsonResponse({
+          original: text,
+          jargonified: result,
+          type: jargonType,
+          source: "Jargon API v1",
+          rateLimit: {
+            remaining: rateLimit.remaining,
+            limits: { perMinute: RATE_LIMITS.perMinute.max, perDay: RATE_LIMITS.perDay.max },
+          },
+        });
+        const headers = new Headers(response.headers);
+        headers.set("X-RateLimit-Remaining-Minute", String(rateLimit.remaining?.minute));
+        headers.set("X-RateLimit-Remaining-Day", String(rateLimit.remaining?.day));
+        return handleCors(new Response(response.body, { status: 200, headers }));
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unknown error";
         return handleCors(

@@ -7,3 +7,7 @@ routes = [{ pattern = "api.kcodes.me", custom_domain = true }]
 rules = [
   { type = "Text", globs = ["**/*.txt"], fallthrough = true }
 ]
+
+[[kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "53d068af6c1c4727aa11be06b2af5913"
