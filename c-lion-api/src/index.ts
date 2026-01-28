@@ -1,10 +1,16 @@
 import { getRandomFact, SEA_LION_FACTS } from "./facts";
 
 const SEA_LION_IMAGES = [
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Sealion_at_Monterey_harbor.jpg/1280px-Sealion_at_Monterey_harbor.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/California_sea_lion_in_La_Jolla_%2870568%29.jpg/1280px-California_sea_lion_in_La_Jolla_%2870568%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/California_sea_lion_at_Point_Lobos_State_Reserve.jpg/1280px-California_sea_lion_at_Point_Lobos_State_Reserve.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Sea_lion_posing.jpg/1280px-Sea_lion_posing.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/f/f5/Sea_lion_family.JPG",
+  "https://upload.wikimedia.org/wikipedia/commons/4/4c/Sealion052006.JPG",
+  "https://upload.wikimedia.org/wikipedia/commons/7/75/Sea_Lions_Pier_39_San_Fran.JPG",
+  "https://upload.wikimedia.org/wikipedia/commons/d/df/Californian_Sea_Lion_Auckland_Zoo.JPG",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3c/California_sea_lion_%2854294112460%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/e/e1/California_Sea_Lion_VA_01.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/c/c5/California_Sea_Lion_VA_03.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/9/90/California_Sea_Lion%2C_Monterey%2C_CA%2C_USA_imported_from_iNaturalist_photo_100213401.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/33/California_Sea_Lion%2C_Pillar_Point_Harbor%2C_CA%2C_US_imported_from_iNaturalist_photo_171254002_%28cropped%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/1/1e/California_Sea_Lion%2C_San_Pedro%2C_Los_Angeles%2C_CA%2C_USA_imported_from_iNaturalist_photo_177215839.jpg",
 ];
 
 function getRandomImage(): string {
