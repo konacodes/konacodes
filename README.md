@@ -7,56 +7,30 @@
 
 ```
 
-this is the monorepo for [kcodes.me](https://kcodes.me) and the various things orbiting it.
+i make things for screens. mostly web stuff. sometimes useful, sometimes just to see if i can.
+
+currently in a reset phase — less planning, more building.
 
 ---
 
-## what's in here
+**lately:**
+- built an api that serves sea lion facts. no reason.
+- made a jargon translator that turns "let's talk" into corporate speak
+- still tweaking my site's animations (they're never done)
 
-| thing | what it does | where it lives |
-|-------|--------------|----------------|
-| **site** | portfolio with too many animations | `src/` |
-| **blog** | markdown cms that i actually use | `blog/` |
-| **films** | same cms but for movies i watch | `films/` |
-| **api** | silly (and less silly) public apis | `c-lion-api/` |
-
-## the api
-
-lives at `api.kcodes.me`. currently serving:
-
-**c-lion** — sea lion facts and memes. because why not.
-```bash
-curl https://api.kcodes.me/c-lion/v1/fact
-curl https://api.kcodes.me/c-lion/v1/meme  # returns svg
-```
-
-**jargon** — turns normal sentences into corporate or legal speak via llm.
-```bash
-curl "https://api.kcodes.me/jargon/v1/corporate?text=we should talk"
-# => "Let's circle back to synergize on this initiative..."
-
-curl "https://api.kcodes.me/jargon/v1/legal?text=you can use this"
-# => "WHEREAS, the party of the first part hereby grants..."
-```
-
-rate limited to prevent my wallet from catching fire.
-
-## running locally
-
-```bash
-bun install
-bun run dev
-```
-
-workers live in their own dirs with their own `package.json`. deploy with `npx wrangler deploy`.
-
-## stack
-
-- bun (runtime, bundler, package manager, everything)
-- cloudflare workers + d1 + kv (hosting, db, cache)
-- react + vite (frontend)
-- cerebras (fast inference for jargon api)
+**usually:**
+- typescript, react, node, python
+- cloudflare for everything that needs to exist somewhere
+- bun because npm is too slow and life is short
 
 ---
+
+i like making things that feel good to use. the small details — transitions, spacing, the way something responds to a click. that stuff matters.
+
+when i'm not coding: probably redesigning something that didn't need it, or up too late again.
+
+---
+
+[kcodes.me](https://kcodes.me) · [github](https://github.com/konacodes) · [discord](https://discord.com/users/1151230208783945818)
 
 <sub>*built between mass and midnight*</sub>
