@@ -83,25 +83,15 @@
 }
 
 [data-theme="dark"] .project-card {
-  box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(212, 176, 120, 0.03);
-}
-
-[data-theme="dark"] .project-card:hover {
-  background: rgba(212, 176, 120, 0.05);
+  box-shadow: var(--shadow-md);
 }
 
 [data-theme="dark"] .sidebar-section {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  box-shadow: var(--shadow-md), inset 0 0.5px 0 0 rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.05);
+  background: rgba(20, 20, 18, 0.5);
 }
 
 [data-theme="dark"] .sidebar-section::before {
-  opacity: 0.035;
+  opacity: 0.1;
 }
 
 [data-theme="dark"] .page::before {
@@ -272,46 +262,29 @@ body {
   opacity: 0.3;
 }
 
-/* Headline glass hover effect */
+/* Headline glass hover effect - thick, floaty, refractive */
 .headline::after {
   content: '';
   position: absolute;
   inset: 4px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+  background: rgba(var(--color-paper-rgb, 248, 245, 240), 0.4);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   opacity: 0;
-  transform: scale(0.92) translateY(8px);
+  transform: scale(0.96) translateY(4px);
   transform-origin: center center;
   transition:
     opacity var(--glass-duration) var(--glass-ease),
     transform var(--glass-duration) var(--glass-ease),
-    border-radius 2s var(--glass-ease);
+    box-shadow var(--glass-duration) var(--glass-ease);
   pointer-events: none;
   z-index: 0;
-  border-radius: 6px;
-  box-shadow:
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.25),
-    inset 0 -0.5px 0 0 rgba(0, 0, 0, 0.05),
-    0 4px 24px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow);
 }
 
 [data-theme="dark"] .headline::after {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.03) 50%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  box-shadow:
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.1),
-    inset 0 -0.5px 0 0 rgba(0, 0, 0, 0.3),
-    0 4px 24px rgba(0, 0, 0, 0.2);
+  background: rgba(20, 20, 18, 0.5);
 }
 
 /* Glass grain overlay for headlines */
@@ -323,60 +296,21 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 1;
-  border-radius: 6px;
+  border-radius: 12px;
   transition: opacity var(--glass-duration) var(--glass-ease);
 }
 
 .headline:hover::after {
   opacity: 1;
-  transform: scale(1) translateY(0);
-  animation:
-    glassBlob 6s var(--glass-ease) infinite,
-    glassRefract 3s ease-in-out infinite;
-  /* Shimmer gradient overlay */
-  background:
-    linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.08) 45%,
-      rgba(255, 255, 255, 0.15) 50%,
-      rgba(255, 255, 255, 0.08) 55%,
-      transparent 100%
-    ),
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-  background-size: 200% 100%, 100% 100%;
-  animation:
-    glassBlob 6s var(--glass-ease) infinite,
-    glassShimmer 3s ease-in-out infinite,
-    glassRefract 4s ease-in-out infinite;
+  transform: scale(1) translateY(-2px);
 }
 
 [data-theme="dark"] .headline:hover::after {
-  background:
-    linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.04) 45%,
-      rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 255, 255, 0.04) 55%,
-      transparent 100%
-    ),
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.03) 50%,
-      rgba(255, 255, 255, 0.01) 100%
-    );
-  background-size: 200% 100%, 100% 100%;
+  background: rgba(20, 20, 18, 0.6);
 }
 
 .headline:hover::before {
-  opacity: 0.035;
+  opacity: var(--glass-grain-opacity);
 }
 
 /* Content above glass */
@@ -442,27 +376,23 @@ body {
 .sidebar-section {
   margin-bottom: var(--space-md);
   padding: var(--space-sm);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(8px) saturate(1.1);
-  -webkit-backdrop-filter: blur(8px) saturate(1.1);
-  box-shadow: var(--shadow-md), inset 0 0.5px 0 0 rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
+  background: rgba(var(--color-paper-rgb, 248, 245, 240), 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--glass-shadow);
+  border: none;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
 }
 
-/* Subtle grain on sidebar sections */
+/* Grain on sidebar sections */
 .sidebar-section::before {
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
   border-radius: inherit;
@@ -520,34 +450,32 @@ body {
   content: '';
   position: absolute;
   bottom: -4px;
-  left: -6px;
-  right: -6px;
+  left: -8px;
+  right: -8px;
   height: calc(100% + 8px);
   top: -4px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.03) 100%
-  );
-  backdrop-filter: blur(8px) saturate(1.15);
-  -webkit-backdrop-filter: blur(8px) saturate(1.15);
-  border-radius: 4px;
+  background: rgba(var(--color-paper-rgb, 248, 245, 240), 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 6px;
   opacity: 0;
-  transform: scale(0.9);
+  transform: scale(0.92) translateY(2px);
   transition:
-    opacity 0.25s var(--ease-out),
-    transform 0.25s var(--ease-out);
+    opacity 0.3s var(--glass-ease),
+    transform 0.3s var(--glass-ease);
   z-index: -1;
-  box-shadow: inset 0 0.5px 0 0 rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 4px 8px rgba(0, 0, 0, 0.03),
+    0 8px 16px rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="dark"] .sidebar-link::after {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  box-shadow: inset 0 0.5px 0 0 rgba(255, 255, 255, 0.08);
+  background: rgba(20, 20, 18, 0.6);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 4px 8px rgba(0, 0, 0, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-link:hover {
@@ -556,7 +484,7 @@ body {
 
 .sidebar-link:hover::after {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1) translateY(-1px);
 }
 
 /* ============================================
@@ -652,42 +580,29 @@ body {
   overflow: hidden;
 }
 
-/* Project card glass hover */
+/* Project card glass hover - thick, floaty, refractive */
 .project-card::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.06) 40%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+  background: rgba(var(--color-paper-rgb, 248, 245, 240), 0.4);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   opacity: 0;
-  transform: scale(0.95);
+  transform: scale(0.98) translateY(2px);
   transform-origin: center center;
   transition:
     opacity var(--glass-duration) var(--glass-ease),
-    transform var(--glass-duration) var(--glass-ease);
+    transform var(--glass-duration) var(--glass-ease),
+    box-shadow var(--glass-duration) var(--glass-ease);
   pointer-events: none;
   z-index: 0;
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  box-shadow: var(--glass-shadow);
 }
 
 [data-theme="dark"] .project-card::after {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0.03) 40%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.2);
+  background: rgba(20, 20, 18, 0.5);
 }
 
 /* Glass grain on project cards */
@@ -699,56 +614,21 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 1;
+  border-radius: 8px;
   transition: opacity var(--glass-duration) var(--glass-ease);
 }
 
 .project-card:hover::after {
   opacity: 1;
-  transform: scale(1);
-  /* Multi-layered shimmer effect */
-  background:
-    linear-gradient(
-      110deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.06) 40%,
-      rgba(255, 255, 255, 0.12) 50%,
-      rgba(255, 255, 255, 0.06) 60%,
-      transparent 100%
-    ),
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.12) 0%,
-      rgba(255, 255, 255, 0.06) 40%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-  background-size: 200% 100%, 100% 100%;
-  animation:
-    glassBlob 5s var(--glass-ease) infinite,
-    glassShimmer 4s ease-in-out infinite,
-    glassRefract 3s ease-in-out infinite;
+  transform: scale(1) translateY(-3px);
 }
 
 [data-theme="dark"] .project-card:hover::after {
-  background:
-    linear-gradient(
-      110deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.03) 40%,
-      rgba(255, 255, 255, 0.06) 50%,
-      rgba(255, 255, 255, 0.03) 60%,
-      transparent 100%
-    ),
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.07) 0%,
-      rgba(255, 255, 255, 0.03) 40%,
-      rgba(255, 255, 255, 0.01) 100%
-    );
-  background-size: 200% 100%, 100% 100%;
+  background: rgba(20, 20, 18, 0.6);
 }
 
 .project-card:hover::before {
-  opacity: 0.04;
+  opacity: var(--glass-grain-opacity);
 }
 
 /* Content above glass */
@@ -760,7 +640,7 @@ body {
 }
 
 .project-card:hover {
-  border-color: var(--color-accent);
+  border-color: var(--color-rule);
 }
 
 .project-card:hover .project-title {
@@ -998,26 +878,20 @@ body {
   top: var(--space-md);
   right: var(--space-md);
   z-index: 100;
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 48px;
+  height: 48px;
+  border: none;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.25);
+  background: rgba(var(--color-paper-rgb, 248, 245, 240), 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--glass-shadow);
   color: var(--color-ink);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s var(--ease-out);
+  transition: all 0.35s var(--glass-ease);
   overflow: hidden;
 }
 
@@ -1026,37 +900,38 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   pointer-events: none;
   border-radius: inherit;
 }
 
 [data-theme="dark"] .theme-toggle {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.2),
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.12);
+  background: rgba(20, 20, 18, 0.6);
+}
+
+[data-theme="dark"] .theme-toggle::before {
+  opacity: 0.1;
 }
 
 .theme-toggle:hover {
-  border-color: var(--color-accent);
   color: var(--color-accent);
-  transform: scale(1.08);
+  transform: translateY(-3px);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.12),
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.3);
+    0 2px 4px rgba(0, 0, 0, 0.03),
+    0 4px 8px rgba(0, 0, 0, 0.04),
+    0 8px 16px rgba(0, 0, 0, 0.05),
+    0 16px 32px rgba(0, 0, 0, 0.06),
+    0 24px 48px rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="dark"] .theme-toggle:hover {
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.15);
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.12),
+    0 16px 32px rgba(0, 0, 0, 0.14),
+    0 24px 48px rgba(0, 0, 0, 0.12);
 }
 
 .theme-toggle:active {
@@ -1109,189 +984,37 @@ body {
 
 /* ============================================
    Frosted Glass System
+   Thick, floaty glass with real refraction
    ============================================ */
 :root {
-  /* Glass properties */
-  --glass-blur: 12px;
-  --glass-saturation: 1.2;
-  --glass-brightness: 1.05;
-  --glass-opacity: 0.7;
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  --glass-grain-opacity: 0.03;
+  /* Heavy blur for true refraction distortion */
+  --glass-blur: 24px;
+  --glass-grain-opacity: 0.08;
 
-  /* Fluid animation timing */
-  --glass-ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --glass-duration: 0.5s;
+  /* Floaty layered shadow - creates depth/lift */
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.02),
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 4px 8px rgba(0, 0, 0, 0.03),
+    0 8px 16px rgba(0, 0, 0, 0.04),
+    0 16px 32px rgba(0, 0, 0, 0.05),
+    0 32px 48px rgba(0, 0, 0, 0.04);
+
+  /* Animation */
+  --glass-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --glass-duration: 0.45s;
 }
 
 [data-theme="dark"] {
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --glass-brightness: 1.1;
-  --glass-grain-opacity: 0.04;
-}
+  --glass-grain-opacity: 0.12;
 
-/* Glass grain texture - SVG noise filter */
-.glass-grain {
-  position: relative;
-}
-
-.glass-grain::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: var(--glass-grain-opacity);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 2;
-  border-radius: inherit;
-}
-
-/* Fluid glass hover overlay */
-.glass-hover {
-  position: relative;
-  overflow: hidden;
-}
-
-.glass-hover::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
-  opacity: 0;
-  transform: scale(0.8) translateY(20px);
-  transform-origin: center center;
-  transition:
-    opacity var(--glass-duration) var(--glass-ease),
-    transform var(--glass-duration) var(--glass-ease);
-  pointer-events: none;
-  z-index: 0;
-  border-radius: 4px;
-  box-shadow:
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.2),
-    inset 0 -0.5px 0 0 rgba(0, 0, 0, 0.05),
-    var(--glass-shadow);
-}
-
-[data-theme="dark"] .glass-hover::after {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.03) 50%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  box-shadow:
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.1),
-    inset 0 -0.5px 0 0 rgba(0, 0, 0, 0.2),
-    var(--glass-shadow);
-}
-
-.glass-hover:hover::after {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-}
-
-/* Glass grain on hover overlay */
-.glass-hover::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1;
-  border-radius: 4px;
-  transition: opacity var(--glass-duration) var(--glass-ease);
-}
-
-.glass-hover:hover::before {
-  opacity: var(--glass-grain-opacity);
-}
-
-/* Ensure content stays above glass */
-.glass-hover > * {
-  position: relative;
-  z-index: 3;
-}
-
-/* Fluid blob animation for extra organic feel */
-@keyframes glassBlob {
-  0%, 100% {
-    border-radius: 4px 8px 4px 8px;
-  }
-  25% {
-    border-radius: 8px 4px 8px 4px;
-  }
-  50% {
-    border-radius: 6px 6px 6px 6px;
-  }
-  75% {
-    border-radius: 4px 8px 6px 4px;
-  }
-}
-
-/* Subtle shimmer that travels across the glass */
-@keyframes glassShimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Light refraction animation */
-@keyframes glassRefract {
-  0%, 100% {
-    filter: brightness(1) saturate(1.2);
-  }
-  50% {
-    filter: brightness(1.02) saturate(1.25);
-  }
-}
-
-.glass-hover:hover::after {
-  animation: glassBlob 4s var(--glass-ease) infinite;
-}
-
-/* Static glass panel (always visible) */
-.glass-panel {
-  position: relative;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.06) 50%,
-    rgba(255, 255, 255, 0.03) 100%
-  );
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
-  border: 1px solid var(--glass-border);
-  box-shadow:
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.2),
-    inset 0 -0.5px 0 0 rgba(0, 0, 0, 0.05),
-    var(--glass-shadow);
-  border-radius: 8px;
-}
-
-[data-theme="dark"] .glass-panel {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.04) 50%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  box-shadow:
-    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.08),
-    inset 0 -0.5px 0 0 rgba(0, 0, 0, 0.3),
-    var(--glass-shadow);
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 4px 8px rgba(0, 0, 0, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.10),
+    0 16px 32px rgba(0, 0, 0, 0.12),
+    0 32px 48px rgba(0, 0, 0, 0.10);
 }
 
 /* ============================================
@@ -1327,12 +1050,10 @@ body {
     clip-path: circle(150% at var(--splash-x) var(--splash-y));
   }
 
-  /* Disable glass animations but keep the static effect */
+  /* Keep glass visible but instant transitions */
   .headline:hover::after,
-  .project-card:hover::after,
-  .glass-hover:hover::after {
-    animation: none !important;
-    transform: scale(1) translateY(0) !important;
+  .project-card:hover::after {
+    transform: scale(1) translateY(-2px) !important;
   }
 }
 
