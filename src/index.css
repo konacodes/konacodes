@@ -160,6 +160,35 @@ body {
   transition: opacity 0.3s ease;
 }
 
+/* ============================================
+   Water Ripple Shader
+   ============================================ */
+.water-ripple-shader {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  mix-blend-mode: overlay;
+}
+
+[data-theme="dark"] .water-ripple-shader {
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .water-ripple-shader {
+    display: none;
+  }
+}
+
+@media print {
+  .water-ripple-shader {
+    display: none;
+  }
+}
+
 /* Paper grain texture overlay */
 .page::before {
   content: '';

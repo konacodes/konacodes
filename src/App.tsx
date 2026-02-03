@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, createContext, useContext, useCallback } from "react";
 import "./index.css";
+import { WaterRippleShader } from "./WaterRippleShader";
 
 // ============================================
 // Theme Context
@@ -632,6 +633,7 @@ export function App() {
 
   return (
     <ThemeProvider>
+      <WaterRippleShader />
       {renderPage()}
     </ThemeProvider>
   );
