@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, createContext, useContext, useCallback } from "react";
 import "./index.css";
+import { WaterSimulation } from "./WaterSimulation";
 
 // ============================================
 // Theme Context
@@ -353,10 +354,56 @@ function UsesPage() {
 }
 
 // ============================================
+// Water Simulation Page
+// ============================================
+function WaterPage() {
+  return (
+    <div className="water-page">
+      <div className="water-simulation-container">
+        <WaterSimulation />
+      </div>
+
+      <div className="water-ui-overlay">
+        <header className="water-header">
+          <a href="/" className="back-link water-back-link">
+            ← Back
+          </a>
+          <h1 className="water-title">Water Physics</h1>
+          <p className="water-subtitle">
+            SPH fluid simulation with real-time particle physics
+          </p>
+        </header>
+
+        <div className="water-instructions">
+          <p>Click and drag to interact with the water</p>
+          <p className="water-hint">
+            Watch how particles create ripples and splashes
+          </p>
+        </div>
+
+        <footer className="water-footer">
+          <p className="water-credits">
+            Particle-based SPH simulation with continuous undulation
+          </p>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
 // Labs Page
 // ============================================
 function LabsPage() {
   const projects = [
+    {
+      id: 'water',
+      title: 'Water Physics',
+      description: 'SPH fluid simulation with particle-based physics. Real-time water that undulates, splashes, and ripples. Click and drag to interact.',
+      tech: ['TypeScript', 'Canvas', 'Physics'],
+      href: '/water',
+      status: 'active'
+    },
     {
       id: 'duck',
       title: 'Duck Lang',
@@ -599,7 +646,7 @@ function useRoute() {
       if (anchor && anchor.href.startsWith(window.location.origin)) {
         const url = new URL(anchor.href);
         // Only handle internal non-blog/films routes
-        if (url.pathname === '/' || url.pathname === '/labs' || url.pathname === '/now' || url.pathname === '/uses') {
+        if (url.pathname === '/' || url.pathname === '/labs' || url.pathname === '/now' || url.pathname === '/uses' || url.pathname === '/water') {
           e.preventDefault();
           window.history.pushState({}, '', url.pathname);
           setPath(url.pathname);
@@ -626,6 +673,7 @@ export function App() {
       case '/labs': return <LabsPage />;
       case '/now': return <NowPage />;
       case '/uses': return <UsesPage />;
+      case '/water': return <WaterPage />;
       default: return <HomePage />;
     }
   };

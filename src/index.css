@@ -812,6 +812,306 @@ body {
 }
 
 /* ============================================
+   Water Simulation
+   ============================================ */
+.water-simulation-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.water-simulation {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 25, 47, 0.95) 0%,
+    rgba(20, 40, 70, 0.9) 50%,
+    rgba(30, 60, 90, 0.85) 100%
+  );
+}
+
+.water-simulation:active {
+  cursor: grabbing;
+}
+
+/* Dark theme water colors */
+[data-theme="dark"] .water-simulation {
+  background: linear-gradient(
+    180deg,
+    rgba(5, 15, 30, 0.98) 0%,
+    rgba(15, 30, 50, 0.95) 50%,
+    rgba(25, 45, 70, 0.9) 100%
+  );
+}
+
+/* Light theme water colors - more tropical */
+[data-theme="light"] .water-simulation {
+  background: linear-gradient(
+    180deg,
+    rgba(150, 200, 240, 0.95) 0%,
+    rgba(100, 170, 220, 0.9) 50%,
+    rgba(70, 140, 200, 0.85) 100%
+  );
+}
+
+/* Water overlay that sits on top of content */
+.water-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 60%,
+    rgba(30, 60, 100, 0.1) 80%,
+    rgba(30, 60, 100, 0.2) 100%
+  );
+  mix-blend-mode: overlay;
+}
+
+[data-theme="light"] .water-overlay {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 60%,
+    rgba(100, 180, 255, 0.05) 80%,
+    rgba(100, 180, 255, 0.1) 100%
+  );
+}
+
+/* Water ripple effect for interactions */
+@keyframes waterRipple {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.water-ripple {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(150, 200, 255, 0.4) 0%,
+    rgba(100, 180, 255, 0.2) 40%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  animation: waterRipple 1s ease-out forwards;
+  pointer-events: none;
+}
+
+/* Caustic light effect animation */
+@keyframes causticShimmer {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(1) translate(0, 0);
+  }
+  25% {
+    opacity: 0.15;
+    transform: scale(1.1) translate(5%, 5%);
+  }
+  50% {
+    opacity: 0.08;
+    transform: scale(0.95) translate(-3%, 3%);
+  }
+  75% {
+    opacity: 0.12;
+    transform: scale(1.05) translate(3%, -5%);
+  }
+}
+
+.caustic-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 300px 200px at 30% 70%, rgba(150, 200, 255, 0.1), transparent),
+    radial-gradient(ellipse 200px 300px at 70% 60%, rgba(100, 180, 255, 0.08), transparent),
+    radial-gradient(ellipse 250px 150px at 50% 80%, rgba(180, 220, 255, 0.06), transparent);
+  animation: causticShimmer 8s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+/* Water surface tension line */
+.water-surface-line {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(200, 230, 255, 0.3) 20%,
+    rgba(200, 230, 255, 0.5) 50%,
+    rgba(200, 230, 255, 0.3) 80%,
+    transparent 100%
+  );
+  z-index: 3;
+  pointer-events: none;
+  animation: surfaceWave 4s ease-in-out infinite;
+}
+
+@keyframes surfaceWave {
+  0%, 100% {
+    transform: scaleX(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleX(1.02);
+    opacity: 0.7;
+  }
+}
+
+/* Underwater bubble effect */
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-50vh) scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.water-bubble {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.8),
+    rgba(150, 200, 255, 0.4) 50%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: bubbleRise 4s ease-out forwards;
+}
+
+/* Water Page Layout */
+.water-page {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #0a192f;
+}
+
+.water-ui-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+}
+
+.water-header {
+  text-align: center;
+  animation: fadeSlideUp 0.6s var(--ease-out) backwards;
+}
+
+.water-back-link {
+  pointer-events: auto;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s ease;
+}
+
+.water-back-link:hover {
+  color: rgba(150, 200, 255, 1);
+}
+
+.water-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  margin: var(--space-sm) 0 var(--space-xs);
+  text-shadow: 0 2px 20px rgba(100, 180, 255, 0.3);
+  letter-spacing: 0.05em;
+}
+
+.water-subtitle {
+  font-size: 0.9rem;
+  color: rgba(150, 200, 255, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.water-instructions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  animation: fadeSlideUp 0.6s var(--ease-out) 0.2s backwards;
+}
+
+.water-instructions p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  margin-bottom: var(--space-xs);
+}
+
+.water-hint {
+  font-size: 0.8rem !important;
+  color: rgba(150, 200, 255, 0.5) !important;
+  font-style: italic;
+}
+
+.water-footer {
+  text-align: center;
+  animation: fadeSlideUp 0.6s var(--ease-out) 0.4s backwards;
+}
+
+.water-credits {
+  font-size: 0.75rem;
+  color: rgba(150, 200, 255, 0.4);
+  letter-spacing: 0.02em;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .water-simulation-container {
+    display: none;
+  }
+
+  .water-page {
+    background: linear-gradient(
+      180deg,
+      #0a192f 0%,
+      #112240 50%,
+      #1a365d 100%
+    );
+  }
+
+  .water-instructions p:first-child::after {
+    content: " (Animation disabled due to reduced motion preference)";
+  }
+}
+
+/* ============================================
    Print Styles (for that extra editorial touch)
    ============================================ */
 @media print {
@@ -826,5 +1126,11 @@ body {
 
   .headline {
     break-inside: avoid;
+  }
+
+  .water-simulation-container,
+  .water-overlay,
+  .caustic-overlay {
+    display: none;
   }
 }
