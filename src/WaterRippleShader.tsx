@@ -24,16 +24,20 @@ const fragmentShaderSource = `
   uniform float u_isDark;
 
   // Ripple buffer - stores recent mouse positions for trail effect
-  uniform vec2 u_ripples[16];
-  uniform float u_rippleTimes[16];
-  uniform float u_rippleStrengths[16];
+  uniform vec2 u_ripples[24];
+  uniform float u_rippleTimes[24];
+  uniform float u_rippleStrengths[24];
 
   // Hash function for noise
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
   }
 
-  // 2D noise
+  float hash21(vec2 p) {
+    return fract(sin(dot(p, vec2(41.1, 289.7))) * 45758.5453);
+  }
+
+  // Smooth 2D noise
   float noise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
@@ -47,13 +51,13 @@ const fragmentShaderSource = `
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
   }
 
-  // Fractal Brownian Motion for fine detail
+  // Fractal Brownian Motion for organic detail
   float fbm(vec2 p) {
     float value = 0.0;
     float amplitude = 0.5;
     float frequency = 1.0;
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
       value += amplitude * noise(p * frequency);
       amplitude *= 0.5;
       frequency *= 2.0;
@@ -62,46 +66,82 @@ const fragmentShaderSource = `
     return value;
   }
 
-  // Pattern that mixes squares and circles
-  float pattern(vec2 p, float scale) {
-    vec2 grid = fract(p * scale);
-    vec2 gridCenter = grid - 0.5;
+  // Voronoi for cell-like pattern
+  float voronoi(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
 
-    // Circle pattern
-    float circle = length(gridCenter);
+    float minDist = 1.0;
 
-    // Square pattern (using max for box SDF)
-    float square = max(abs(gridCenter.x), abs(gridCenter.y));
+    for (int y = -1; y <= 1; y++) {
+      for (int x = -1; x <= 1; x++) {
+        vec2 neighbor = vec2(float(x), float(y));
+        vec2 point = hash21(i + neighbor) * 0.5 + 0.25;
+        point = 0.5 + 0.5 * sin(u_time * 0.3 + 6.2831 * point);
+        vec2 diff = neighbor + point - f;
+        float dist = length(diff);
+        minDist = min(minDist, dist);
+      }
+    }
 
-    // Mix between circle and square based on noise
-    float mixFactor = noise(floor(p * scale) * 0.1 + u_time * 0.02);
-    float shape = mix(circle, square, mixFactor);
-
-    // Create fine detail by combining multiple scales
-    float detail = fbm(p * scale * 2.0 + u_time * 0.05);
-
-    return shape + detail * 0.3;
+    return minDist;
   }
 
-  // Single ripple contribution
+  // Pattern mixing squares and circles
+  float cellPattern(vec2 p, float scale) {
+    vec2 grid = fract(p * scale);
+    vec2 gridId = floor(p * scale);
+    vec2 gridCenter = grid - 0.5;
+
+    // Randomize shape per cell
+    float shapeType = hash(gridId);
+
+    // Circle
+    float circle = length(gridCenter) * 2.0;
+
+    // Square (rounded)
+    float square = max(abs(gridCenter.x), abs(gridCenter.y)) * 2.0;
+
+    // Diamond
+    float diamond = (abs(gridCenter.x) + abs(gridCenter.y)) * 1.5;
+
+    // Mix shapes based on cell
+    float shape;
+    if (shapeType < 0.33) {
+      shape = circle;
+    } else if (shapeType < 0.66) {
+      shape = square;
+    } else {
+      shape = diamond;
+    }
+
+    return shape;
+  }
+
+  // Single ripple contribution with realistic water physics
   float ripple(vec2 uv, vec2 center, float time, float strength) {
     float dist = length(uv - center);
-    float rippleSpeed = 0.4;
-    float rippleWidth = 0.08;
 
-    // Expanding ring
-    float ring = dist - time * rippleSpeed;
+    // Multiple expanding rings
+    float rippleSpeed = 0.5;
+    float wavelength = 25.0;
 
-    // Smooth ring shape
-    float wave = sin(ring * 40.0) * 0.5 + 0.5;
+    // Main wave
+    float phase = dist * wavelength - time * rippleSpeed * wavelength;
+    float wave = sin(phase) * 0.5 + 0.5;
 
-    // Fade based on distance and time
-    float fade = exp(-dist * 3.0) * exp(-time * 2.0) * strength;
+    // Secondary harmonics for realism
+    float wave2 = sin(phase * 2.0 + 1.0) * 0.25 + 0.25;
+    wave = wave * 0.7 + wave2 * 0.3;
 
-    // Width falloff
-    float width = smoothstep(rippleWidth, 0.0, abs(ring - 0.1));
+    // Amplitude decay with distance and time
+    float distDecay = 1.0 / (1.0 + dist * 4.0);
+    float timeDecay = exp(-time * 1.5);
 
-    return wave * fade * width;
+    // Sharper leading edge
+    float leading = smoothstep(time * rippleSpeed + 0.02, time * rippleSpeed, dist);
+
+    return wave * distDecay * timeDecay * strength * leading * 2.0;
   }
 
   void main() {
@@ -110,69 +150,83 @@ const fragmentShaderSource = `
     vec2 uvAspect = uv * aspect;
     vec2 mouseAspect = u_mouse * aspect;
 
-    // Base pattern - very fine-grained
-    float basePattern = pattern(uvAspect, 80.0);
-    float finePattern = pattern(uvAspect, 160.0);
-    float tinyPattern = pattern(uvAspect, 320.0);
+    // Base cellular pattern at multiple scales
+    float cells1 = cellPattern(uvAspect + u_time * 0.02, 15.0);
+    float cells2 = cellPattern(uvAspect - u_time * 0.015, 30.0);
+    float cells3 = cellPattern(uvAspect + vec2(u_time * 0.01, -u_time * 0.02), 60.0);
 
-    // Combine patterns at different scales
-    float combinedPattern = basePattern * 0.4 + finePattern * 0.35 + tinyPattern * 0.25;
+    // Voronoi for organic movement
+    float vor = voronoi(uvAspect * 8.0 + u_time * 0.1);
 
-    // Mouse influence - subtle displacement based on velocity
+    // FBM for flowing detail
+    float flow = fbm(uvAspect * 5.0 + u_time * 0.08);
+
+    // Combine patterns
+    float pattern = cells1 * 0.4 + cells2 * 0.3 + cells3 * 0.2 + vor * 0.3 + flow * 0.2;
+
+    // Mouse interaction - displacement field
     float mouseDistance = length(uvAspect - mouseAspect);
     float velocityMag = length(u_mouseVelocity);
+    vec2 toMouse = (uvAspect - mouseAspect) / (mouseDistance + 0.001);
 
-    // Create water push effect
-    vec2 toMouse = normalize(uvAspect - mouseAspect + 0.001);
-    float pushStrength = exp(-mouseDistance * 4.0) * velocityMag * 0.5;
+    // Push effect - water being displaced
+    float pushRadius = 0.3 + velocityMag * 0.2;
+    float pushStrength = smoothstep(pushRadius, 0.0, mouseDistance) * velocityMag;
 
-    // Displace the pattern based on mouse push
-    vec2 displacement = toMouse * pushStrength * 0.02;
-    float displacedPattern = pattern(uvAspect + displacement, 80.0);
+    // Displace pattern coordinates
+    vec2 displacement = toMouse * pushStrength * 0.15;
+    float displacedPattern = cellPattern(uvAspect + displacement, 15.0);
+
+    // Blend original and displaced pattern
+    pattern = mix(pattern, displacedPattern, min(pushStrength * 1.5, 1.0));
 
     // Accumulate ripples from trail
     float rippleSum = 0.0;
-    for (int i = 0; i < 16; i++) {
-      if (u_rippleStrengths[i] > 0.01) {
+    for (int i = 0; i < 24; i++) {
+      if (u_rippleStrengths[i] > 0.001) {
         vec2 ripplePos = u_ripples[i] * aspect;
         float rippleTime = u_time - u_rippleTimes[i];
-        rippleSum += ripple(uvAspect, ripplePos, rippleTime, u_rippleStrengths[i]);
+        if (rippleTime > 0.0 && rippleTime < 3.0) {
+          rippleSum += ripple(uvAspect, ripplePos, rippleTime, u_rippleStrengths[i]);
+        }
       }
     }
 
-    // Subtle wave motion in background
-    float ambientWave = sin(uvAspect.x * 20.0 + u_time * 0.3) *
-                        sin(uvAspect.y * 15.0 + u_time * 0.2) * 0.02;
+    // Ambient subtle waves
+    float ambient = sin(uvAspect.x * 12.0 + u_time * 0.5) *
+                    sin(uvAspect.y * 10.0 + u_time * 0.4) * 0.08;
+    ambient += sin(uvAspect.x * 25.0 - u_time * 0.3) *
+               cos(uvAspect.y * 20.0 + u_time * 0.35) * 0.04;
 
-    // Combine all effects
-    float finalPattern = mix(combinedPattern, displacedPattern, min(pushStrength * 2.0, 1.0));
-    finalPattern += rippleSum * 0.3;
-    finalPattern += ambientWave;
+    // Combine everything
+    float finalValue = pattern * 0.6 + rippleSum + ambient;
 
-    // Very subtle intensity - this is key for the "barely noticeable" effect
-    float intensity = (finalPattern - 0.5) * 0.025;
+    // Mouse glow/highlight
+    float glow = exp(-mouseDistance * 3.0) * (0.15 + velocityMag * 0.4);
+    finalValue += glow;
 
-    // Add slight highlight near mouse with gentle falloff
-    float mouseGlow = exp(-mouseDistance * 2.0) * velocityMag * 0.02;
-    intensity += mouseGlow;
+    // Normalize and create variation
+    float intensity = (finalValue - 0.5) * 0.4;
 
-    // Output subtle luminosity variation
-    // In light mode: slightly darker/lighter variations of the paper color
-    // In dark mode: slightly lighter variations
-    float baseValue = mix(0.0, 0.0, u_isDark);
-    float variation = intensity;
+    // Color variation - warm highlights, cool shadows
+    vec3 warmColor = vec3(1.0, 0.95, 0.85);
+    vec3 coolColor = vec3(0.85, 0.9, 1.0);
+    vec3 baseColor = mix(coolColor, warmColor, finalValue);
 
-    // Alpha determines how visible the effect is
-    float alpha = abs(variation) * 2.0 + 0.01;
-    alpha = min(alpha, 0.08); // Cap maximum visibility
+    // Add subtle color based on ripples
+    vec3 rippleColor = vec3(0.95, 0.98, 1.0);
+    baseColor = mix(baseColor, rippleColor, rippleSum * 0.5);
 
-    // Color: slight warm/cool shift based on pattern
-    vec3 warmShift = vec3(0.02, 0.01, -0.01);
-    vec3 coolShift = vec3(-0.01, 0.0, 0.02);
-    vec3 colorShift = mix(coolShift, warmShift, finalPattern) * 0.5;
+    // Final color with intensity
+    vec3 color = baseColor * (0.5 + intensity);
 
-    // Final color with very subtle variation
-    vec3 color = vec3(0.5 + variation) + colorShift;
+    // Alpha - more visible now
+    float alpha = 0.08 + abs(intensity) * 0.4 + rippleSum * 0.3 + glow * 0.3;
+    alpha = clamp(alpha, 0.0, 0.6);
+
+    // Boost alpha near mouse when moving
+    alpha += smoothstep(0.4, 0.0, mouseDistance) * velocityMag * 0.3;
+    alpha = clamp(alpha, 0.0, 0.7);
 
     gl_FragColor = vec4(color, alpha);
   }
@@ -198,7 +252,7 @@ export function WaterRippleShader() {
   const lastMouseRef = useRef({ x: 0.5, y: 0.5 });
   const lastMouseTimeRef = useRef(Date.now());
 
-  // Ripple trail buffer
+  // Ripple trail buffer - increased size
   const ripplesRef = useRef<RipplePoint[]>([]);
   const lastRippleTimeRef = useRef(0);
 
@@ -312,7 +366,7 @@ export function WaterRippleShader() {
     isDarkRef.current = document.documentElement.getAttribute('data-theme') === 'dark';
 
     // Update velocity with damping (water-like physics)
-    const damping = 0.92;
+    const damping = 0.94;
     mouseVelocityRef.current.x *= damping;
     mouseVelocityRef.current.y *= damping;
 
@@ -344,14 +398,14 @@ export function WaterRippleShader() {
 
     // Clean up old ripples and prepare data
     const currentTime = time;
-    ripplesRef.current = ripples.filter(r => currentTime - r.time < 2.0);
+    ripplesRef.current = ripples.filter(r => currentTime - r.time < 3.0);
 
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 24; i++) {
       if (i < ripplesRef.current.length) {
         const r = ripplesRef.current[i];
         ripplePositions.push(r.x, 1.0 - r.y);
         rippleTimes.push(r.time);
-        rippleStrengths.push(r.strength * Math.exp(-(currentTime - r.time) * 1.5));
+        rippleStrengths.push(r.strength * Math.exp(-(currentTime - r.time) * 0.8));
       } else {
         ripplePositions.push(0, 0);
         rippleTimes.push(0);
@@ -392,24 +446,25 @@ export function WaterRippleShader() {
       const vy = (newY - lastMouseRef.current.y) / dt;
 
       // Smooth velocity update
-      mouseVelocityRef.current.x = mouseVelocityRef.current.x * 0.7 + vx * 0.3;
-      mouseVelocityRef.current.y = mouseVelocityRef.current.y * 0.7 + vy * 0.3;
+      mouseVelocityRef.current.x = mouseVelocityRef.current.x * 0.6 + vx * 0.4;
+      mouseVelocityRef.current.y = mouseVelocityRef.current.y * 0.6 + vy * 0.4;
 
-      // Add ripple if moving fast enough and enough time has passed
+      // Add ripple more frequently when moving
       const speed = Math.sqrt(vx * vx + vy * vy);
       const time = (Date.now() - startTimeRef.current) / 1000;
 
-      if (speed > 0.3 && time - lastRippleTimeRef.current > 0.05) {
+      // Lower threshold for ripple creation
+      if (speed > 0.15 && time - lastRippleTimeRef.current > 0.03) {
         ripplesRef.current.push({
           x: newX,
           y: newY,
           time: time,
-          strength: Math.min(speed * 0.3, 1.0),
+          strength: Math.min(speed * 0.5, 1.5),
         });
         lastRippleTimeRef.current = time;
 
-        // Keep only recent ripples
-        if (ripplesRef.current.length > 16) {
+        // Keep more ripples
+        if (ripplesRef.current.length > 24) {
           ripplesRef.current.shift();
         }
       }

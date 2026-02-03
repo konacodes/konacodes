@@ -167,14 +167,14 @@ body {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.6;
-  mix-blend-mode: overlay;
+  z-index: 1;
+  opacity: 1;
+  mix-blend-mode: multiply;
 }
 
 [data-theme="dark"] .water-ripple-shader {
-  opacity: 0.4;
-  mix-blend-mode: soft-light;
+  opacity: 0.9;
+  mix-blend-mode: screen;
 }
 
 @media (prefers-reduced-motion: reduce) {
