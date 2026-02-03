@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, createContext, useContext, useCallback } from "react";
 import "./index.css";
-import { WaterRippleShader } from "./WaterRippleShader";
+import { FluidSimulation } from "./FluidSimulation";
 
 // ============================================
 // Theme Context
@@ -633,7 +633,7 @@ export function App() {
 
   return (
     <ThemeProvider>
-      <WaterRippleShader />
+      <FluidSimulation />
       {renderPage()}
     </ThemeProvider>
   );
