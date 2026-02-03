@@ -75,7 +75,7 @@
 }
 
 [data-theme="dark"] body {
-  background: var(--color-paper);
+  background: transparent;
 }
 
 [data-theme="dark"] .tech-tag {
@@ -118,9 +118,12 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body {
+  background: transparent;
+}
+
 body {
   font-family: var(--font-sans);
-  background: var(--color-paper);
   color: var(--color-ink);
   line-height: 1.6;
   min-height: 100vh;
@@ -142,6 +145,7 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+  z-index: 1;
 }
 
 /* ============================================
@@ -165,16 +169,11 @@ body {
    ============================================ */
 .water-ripple-shader {
   position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 1;
-  mix-blend-mode: multiply;
-}
-
-[data-theme="dark"] .water-ripple-shader {
-  opacity: 0.9;
-  mix-blend-mode: screen;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
