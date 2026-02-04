@@ -552,98 +552,95 @@ export function WaterSimulation({ className }: WaterSimulationProps) {
   }, []);
 
   // Render particles with metaball-like effect
-  const render = useCallback((ctx: CanvasRenderingContext2D, sim: FluidSimulator) => {
-    const { width, height } = ctx.canvas;
+  const render = useCallback((ctx: CanvasRenderingContext2D, sim: FluidSimulator, displayWidth: number, displayHeight: number) => {
+    // Clear canvas completely with solid dark background
+    ctx.fillStyle = '#0a192f';
+    ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-    // Clear with slight trail for motion blur effect
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    ctx.fillRect(0, 0, width, height);
-
-    // Create gradient background (water-like)
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
-    bgGradient.addColorStop(0, 'rgba(10, 25, 47, 0.95)');
-    bgGradient.addColorStop(0.5, 'rgba(20, 40, 70, 0.9)');
-    bgGradient.addColorStop(1, 'rgba(30, 60, 90, 0.85)');
+    // Create gradient background (deep ocean)
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, displayHeight);
+    bgGradient.addColorStop(0, '#0a192f');
+    bgGradient.addColorStop(0.4, '#112240');
+    bgGradient.addColorStop(0.7, '#1a365d');
+    bgGradient.addColorStop(1, '#234876');
     ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-    // Render water surface with metaball effect
-    // First pass: render particle density field
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = width;
-    tempCanvas.height = height;
-    const tempCtx = tempCanvas.getContext('2d')!;
+    // Draw water body glow at the bottom
+    const waterGlow = ctx.createLinearGradient(0, displayHeight * 0.5, 0, displayHeight);
+    waterGlow.addColorStop(0, 'rgba(30, 80, 150, 0)');
+    waterGlow.addColorStop(0.5, 'rgba(40, 100, 180, 0.3)');
+    waterGlow.addColorStop(1, 'rgba(50, 120, 200, 0.5)');
+    ctx.fillStyle = waterGlow;
+    ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-    // Draw particles as soft circles
+    // Render particles - larger and more visible
     for (const p of sim.particles) {
-      const gradient = tempCtx.createRadialGradient(
+      const size = p.isSplash ? p.size * 1.5 : p.size * 2;
+
+      // Outer glow
+      const glowGradient = ctx.createRadialGradient(
         p.pos.x, p.pos.y, 0,
-        p.pos.x, p.pos.y, p.size * 3
+        p.pos.x, p.pos.y, size * 4
       );
-
-      const alpha = p.isSplash ? p.color.a : 0.4;
-      gradient.addColorStop(0, `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha})`);
-      gradient.addColorStop(0.5, `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha * 0.5})`);
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-      tempCtx.fillStyle = gradient;
-      tempCtx.beginPath();
-      tempCtx.arc(p.pos.x, p.pos.y, p.size * 3, 0, Math.PI * 2);
-      tempCtx.fill();
-    }
-
-    // Apply threshold to create metaball effect
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.drawImage(tempCanvas, 0, 0);
-    ctx.globalCompositeOperation = 'source-over';
-
-    // Render individual particles for detail
-    for (const p of sim.particles) {
-      // Particle core
-      const coreGradient = ctx.createRadialGradient(
-        p.pos.x - p.size * 0.3, p.pos.y - p.size * 0.3, 0,
-        p.pos.x, p.pos.y, p.size
-      );
-
-      const brightness = Math.min(1, 0.6 + p.vel.length() / 300);
-      const r = Math.floor(p.color.r * brightness);
-      const g = Math.floor(p.color.g * brightness);
-      const b = Math.floor(p.color.b * brightness);
-
-      coreGradient.addColorStop(0, `rgba(${r + 100}, ${g + 50}, ${b}, ${p.color.a * 0.8})`);
-      coreGradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${p.color.a * 0.6})`);
-      coreGradient.addColorStop(1, `rgba(${r * 0.5}, ${g * 0.5}, ${b}, 0)`);
-
-      ctx.fillStyle = coreGradient;
+      const glowAlpha = p.isSplash ? p.color.a * 0.3 : 0.25;
+      glowGradient.addColorStop(0, `rgba(100, 180, 255, ${glowAlpha})`);
+      glowGradient.addColorStop(0.5, `rgba(60, 140, 220, ${glowAlpha * 0.5})`);
+      glowGradient.addColorStop(1, 'rgba(30, 100, 180, 0)');
+      ctx.fillStyle = glowGradient;
       ctx.beginPath();
-      ctx.arc(p.pos.x, p.pos.y, p.size, 0, Math.PI * 2);
+      ctx.arc(p.pos.x, p.pos.y, size * 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Highlight/reflection
-      ctx.fillStyle = `rgba(255, 255, 255, ${p.color.a * 0.3})`;
+      // Main particle body
+      const bodyGradient = ctx.createRadialGradient(
+        p.pos.x - size * 0.3, p.pos.y - size * 0.3, 0,
+        p.pos.x, p.pos.y, size
+      );
+
+      const brightness = Math.min(1.2, 0.7 + p.vel.length() / 200);
+      const r = Math.floor(Math.min(255, p.color.r * brightness + 50));
+      const g = Math.floor(Math.min(255, p.color.g * brightness + 30));
+      const b = Math.floor(Math.min(255, p.color.b * brightness));
+      const alpha = p.isSplash ? p.color.a : 0.9;
+
+      bodyGradient.addColorStop(0, `rgba(${r + 80}, ${g + 60}, ${b + 20}, ${alpha})`);
+      bodyGradient.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${alpha * 0.9})`);
+      bodyGradient.addColorStop(1, `rgba(${r - 30}, ${g - 20}, ${b}, ${alpha * 0.6})`);
+
+      ctx.fillStyle = bodyGradient;
       ctx.beginPath();
-      ctx.arc(p.pos.x - p.size * 0.25, p.pos.y - p.size * 0.25, p.size * 0.3, 0, Math.PI * 2);
+      ctx.arc(p.pos.x, p.pos.y, size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bright highlight/reflection
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(p.pos.x - size * 0.3, p.pos.y - size * 0.3, size * 0.35, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Add caustic light effects on the surface
+    // Add animated caustic light patterns
     const time = Date.now() / 1000;
-    ctx.globalCompositeOperation = 'overlay';
-    for (let i = 0; i < 3; i++) {
-      const x = width * 0.3 + Math.sin(time * 0.5 + i) * width * 0.2;
-      const y = height * 0.6 + Math.cos(time * 0.3 + i * 2) * height * 0.1;
-      const causticGradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
-      causticGradient.addColorStop(0, 'rgba(150, 200, 255, 0.1)');
+    ctx.globalCompositeOperation = 'screen';
+    for (let i = 0; i < 5; i++) {
+      const x = displayWidth * (0.2 + i * 0.15) + Math.sin(time * 0.4 + i * 1.5) * 50;
+      const y = displayHeight * (0.55 + i * 0.08) + Math.cos(time * 0.3 + i) * 30;
+      const causticGradient = ctx.createRadialGradient(x, y, 0, x, y, 80 + i * 20);
+      causticGradient.addColorStop(0, `rgba(150, 220, 255, ${0.15 - i * 0.02})`);
+      causticGradient.addColorStop(0.5, `rgba(100, 180, 240, ${0.08 - i * 0.01})`);
       causticGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = causticGradient;
-      ctx.fillRect(0, 0, width, height);
+      ctx.beginPath();
+      ctx.arc(x, y, 80 + i * 20, 0, Math.PI * 2);
+      ctx.fill();
     }
     ctx.globalCompositeOperation = 'source-over';
 
-    // Render particle count for debugging (optional)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = '12px monospace';
-    ctx.fillText(`Particles: ${sim.particles.length}`, 10, 20);
+    // Render particle count
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '14px monospace';
+    ctx.fillText(`Particles: ${sim.particles.length}`, 10, 25);
   }, []);
 
   useEffect(() => {
@@ -653,16 +650,23 @@ export function WaterSimulation({ className }: WaterSimulationProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
+    // Track display dimensions separately from canvas buffer
+    let displayWidth = 0;
+    let displayHeight = 0;
+
+    // Set canvas size - use 1:1 pixel ratio for simplicity and performance
     const updateSize = () => {
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      displayWidth = rect.width;
+      displayHeight = rect.height;
+
+      // Set canvas buffer size to match display size (1:1 ratio)
+      canvas.width = displayWidth;
+      canvas.height = displayHeight;
 
       if (simulatorRef.current) {
-        simulatorRef.current.resize(rect.width, rect.height);
-        initializeWater(simulatorRef.current, rect.width, rect.height);
+        simulatorRef.current.resize(displayWidth, displayHeight);
+        initializeWater(simulatorRef.current, displayWidth, displayHeight);
       }
     };
 
@@ -734,7 +738,7 @@ export function WaterSimulation({ className }: WaterSimulationProps) {
       if (!simulatorRef.current) return;
 
       simulatorRef.current.step();
-      render(ctx, simulatorRef.current);
+      render(ctx, simulatorRef.current, displayWidth, displayHeight);
 
       animationRef.current = requestAnimationFrame(animate);
     };
