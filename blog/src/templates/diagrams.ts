@@ -152,11 +152,33 @@ export const diagramInitScript = `
             const textColor = isDark ? '#e8e4df' : '#1a1a18';
             const gridColor = isDark ? 'rgba(232, 228, 223, 0.1)' : 'rgba(26, 26, 24, 0.1)';
 
+            // Site accent color palette for chart data
+            const accentPalette = isDark
+              ? ['#d4b078', '#e0c090', '#b8b4ae', '#7a766f', '#c9a66b', '#a89060']
+              : ['#c9a66b', '#d4b078', '#4a4a45', '#8a8a82', '#b8956a', '#a07850'];
+
             // Apply theme colors to config
             if (!config.options) config.options = {};
             if (!config.options.plugins) config.options.plugins = {};
             if (!config.options.plugins.legend) config.options.plugins.legend = {};
             config.options.plugins.legend.labels = { color: textColor };
+
+            // Apply accent colors to datasets if no colors specified
+            if (config.data && config.data.datasets) {
+              config.data.datasets.forEach((dataset, i) => {
+                const color = accentPalette[i % accentPalette.length];
+                if (!dataset.backgroundColor) {
+                  dataset.backgroundColor = config.type === 'line'
+                    ? color + '33' : color;
+                }
+                if (!dataset.borderColor) {
+                  dataset.borderColor = color;
+                }
+                if (config.type === 'line' && dataset.borderWidth === undefined) {
+                  dataset.borderWidth = 2;
+                }
+              });
+            }
 
             if (!config.options.scales) config.options.scales = {};
             ['x', 'y'].forEach(axis => {
