@@ -1,6 +1,7 @@
 import { renderHome, renderPost, renderNotFound, render404 } from './templates/public';
 import { renderAdmin, renderEditor, renderNewPost } from './templates/admin';
 import { marked } from 'marked';
+import { transformDiagramBlock } from './templates/diagrams';
 
 export interface Env {
   DB: D1Database;
@@ -22,7 +23,23 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 10);
 }
 
-// Parse markdown to HTML
+// Configure marked with custom renderer for diagram support
+marked.use({
+  renderer: {
+    code(code: string, infostring: string | undefined, _escaped: boolean): string | false {
+      if (infostring) {
+        const diagramHtml = transformDiagramBlock(infostring, code);
+        if (diagramHtml) {
+          return diagramHtml;
+        }
+      }
+      // Return false to fall back to default renderer
+      return false;
+    }
+  }
+});
+
+// Parse markdown to HTML with diagram support
 async function parseMarkdown(content: string): Promise<string> {
   return await marked(content);
 }

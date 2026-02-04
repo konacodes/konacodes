@@ -1,4 +1,5 @@
 import { baseHead, themeToggleHTML } from './styles';
+import { diagramStyles, diagramScripts, diagramInitScript } from './diagrams';
 
 interface Post {
   id: string;
@@ -195,6 +196,8 @@ export function renderPost(post: Post, htmlContent: string): string {
       ${baseHead}
       <title>${post.title} — kona_</title>
       <meta name="description" content="${post.excerpt || post.title}">
+      ${diagramScripts}
+      <style>${diagramStyles}</style>
       <style>
         .back-link {
           display: inline-flex;
@@ -280,6 +283,7 @@ export function renderPost(post: Post, htmlContent: string): string {
           <a href="/">← more posts</a>
         </footer>
       </div>
+      ${diagramInitScript}
     </body>
     </html>
   `;

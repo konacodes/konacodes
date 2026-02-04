@@ -1,4 +1,5 @@
 import { baseHead } from './styles';
+import { diagramStyles, diagramScripts, diagramInitScript } from './diagrams';
 
 interface Post {
   id: string;
@@ -307,6 +308,8 @@ function renderEditorPage(post: Post, isNew: boolean): string {
       ${baseHead}
       <title>${isNew ? 'new post' : `edit: ${post.title}`} — kona_/blog</title>
       <style>${adminStyles}</style>
+      <style>${diagramStyles}</style>
+      ${diagramScripts}
     </head>
     <body>
       <div class="container">
@@ -401,6 +404,10 @@ function renderEditorPage(post: Post, isNew: boolean): string {
             const data = await res.json();
             preview.innerHTML = data.html;
             preview.classList.remove('empty');
+            // Render any diagrams in the preview
+            if (typeof window.renderDiagrams === 'function') {
+              await window.renderDiagrams();
+            }
           } catch (err) {
             console.error('Preview error:', err);
           }
@@ -464,6 +471,7 @@ function renderEditorPage(post: Post, isNew: boolean): string {
           updatePreview(initialContent);
         }
       </script>
+      ${diagramInitScript}
     </body>
     </html>
   `;
