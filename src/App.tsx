@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, createContext, useContext, useCallback } from "react";
 import "./index.css";
+import { FluidBackground } from "./FluidBackground";
 
 // ============================================
 // Theme Context
@@ -196,8 +197,10 @@ function TimeDisplay() {
 // Now Page
 // ============================================
 function NowPage() {
+  const { theme } = useTheme();
   return (
     <div className="page">
+      <FluidBackground key={`fluid-now-${theme}`} subtle />
       <Spotlight />
       <ThemeToggle />
 
@@ -264,6 +267,7 @@ function NowPage() {
 // Uses Page
 // ============================================
 function UsesPage() {
+  const { theme } = useTheme();
   const categories = [
     {
       title: 'Editor & Terminal',
@@ -311,6 +315,7 @@ function UsesPage() {
 
   return (
     <div className="page">
+      <FluidBackground key={`fluid-uses-${theme}`} subtle />
       <Spotlight />
       <ThemeToggle />
 
@@ -356,6 +361,7 @@ function UsesPage() {
 // Labs Page
 // ============================================
 function LabsPage() {
+  const { theme } = useTheme();
   const projects = [
     {
       id: 'duck',
@@ -401,6 +407,7 @@ function LabsPage() {
 
   return (
     <div className="page">
+      <FluidBackground key={`fluid-labs-${theme}`} subtle />
       <Spotlight />
       <ThemeToggle />
 
@@ -451,6 +458,7 @@ function LabsPage() {
 // Home Page
 // ============================================
 function HomePage() {
+  const { theme } = useTheme();
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
 
   const links = [
@@ -487,6 +495,7 @@ function HomePage() {
 
   return (
     <div className="page">
+      <FluidBackground key={`fluid-home-${theme}`} />
       <Spotlight />
       <ThemeToggle />
 

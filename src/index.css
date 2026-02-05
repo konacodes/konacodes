@@ -159,6 +159,22 @@ body {
   transition: opacity 0.3s ease;
 }
 
+/* ============================================
+   Fluid Background - Depth Shader
+   ============================================ */
+.fluid-background {
+  transition: opacity 0.8s ease;
+  image-rendering: auto;
+}
+
+[data-theme="light"] .fluid-background {
+  mix-blend-mode: multiply;
+}
+
+[data-theme="dark"] .fluid-background {
+  mix-blend-mode: screen;
+}
+
 /* Paper grain texture overlay */
 .page::before {
   content: '';
