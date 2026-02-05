@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kona — 04</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #050505;
+    --white: #f0ece4;
+    --gold: #c9a66b;
+    --grey: #3a3a38;
+    --dim: #1a1a18;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'Space Grotesk', system-ui, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--black);
+    color: var(--white);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  ::selection { background: var(--gold); color: var(--black); }
+
+  /* Grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Layout */
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 3rem;
+  }
+
+  /* === HERO === */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 6rem;
+    position: relative;
+  }
+
+  .hero-name {
+    font-family: var(--serif);
+    font-size: clamp(8rem, 22vw, 18rem);
+    font-weight: 400;
+    line-height: 0.82;
+    letter-spacing: -0.03em;
+    color: var(--white);
+    opacity: 0;
+    animation: riseHeavy 1.2s var(--ease) 0.2s forwards;
+  }
+
+  .hero-line {
+    width: 100%;
+    height: 1px;
+    background: var(--grey);
+    margin-top: 3rem;
+    transform-origin: left;
+    transform: scaleX(0);
+    animation: lineGrow 1s var(--ease) 0.8s forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.25rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    opacity: 0;
+    animation: fadeIn 0.8s ease 1.2s forwards;
+  }
+
+  @keyframes riseHeavy {
+    from { opacity: 0; transform: translateY(60px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes lineGrow {
+    to { transform: scaleX(1); }
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* === SECTIONS === */
+  .section {
+    padding: 8rem 0;
+    border-top: 1px solid var(--dim);
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s var(--ease);
+  }
+
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 4rem;
+  }
+
+  /* === WORK === */
+  .work-item {
+    display: block;
+    text-decoration: none;
+    color: var(--white);
+    padding: 2rem 0;
+    position: relative;
+    transition: all 0.4s var(--ease);
+  }
+
+  .work-item + .work-item {
+    border-top: 1px solid var(--dim);
+  }
+
+  .work-item:hover .wi-name {
+    color: var(--gold);
+    transform: translateX(16px);
+  }
+
+  .work-item:hover .wi-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .wi-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .wi-name {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1;
+    transition: all 0.5s var(--ease);
+  }
+
+  .wi-desc {
+    font-size: 0.8rem;
+    color: var(--grey);
+    max-width: 220px;
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .wi-arrow {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateX(-8px) translateY(-50%);
+    opacity: 0;
+    color: var(--gold);
+    font-size: 1.5rem;
+    transition: all 0.4s var(--ease);
+  }
+
+  /* === ABOUT === */
+  .about-text {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--white);
+    max-width: 800px;
+  }
+
+  .about-text .dim {
+    color: var(--grey);
+  }
+
+  .about-text .gold {
+    color: var(--gold);
+  }
+
+  .philosophy {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--dim);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--grey);
+  }
+
+  /* === CONNECT === */
+  .connect-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--dim);
+  }
+
+  .connect-cell {
+    padding: 3rem 2rem;
+    text-decoration: none;
+    color: var(--white);
+    border-right: 1px solid var(--dim);
+    transition: all 0.4s var(--ease);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .connect-cell:last-child {
+    border-right: none;
+  }
+
+  .connect-cell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateY(100%);
+    transition: transform 0.5s var(--ease);
+    z-index: 0;
+  }
+
+  .connect-cell:hover::after {
+    transform: translateY(0);
+  }
+
+  .connect-cell:hover {
+    color: var(--black);
+  }
+
+  .connect-cell > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cc-name {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .cc-sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--grey);
+    transition: color 0.4s var(--ease);
+  }
+
+  .connect-cell:hover .cc-sub {
+    color: rgba(5, 5, 5, 0.5);
+  }
+
+  /* Pages row */
+  .pages-row {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--dim);
+    border-top: none;
+  }
+
+  .page-link {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    text-decoration: none;
+    border-right: 1px solid var(--dim);
+    transition: all 0.3s var(--ease);
+  }
+
+  .page-link:last-child { border-right: none; }
+
+  .page-link:hover {
+    color: var(--gold);
+    background: rgba(201, 166, 107, 0.03);
+  }
+
+  /* === FOOTER === */
+  .footer {
+    padding: 3rem 0;
+    border-top: 1px solid var(--dim);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--grey);
+    letter-spacing: 0.1em;
+  }
+
+  /* Back */
+  .back {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    font-size: 0.7rem;
+    color: var(--grey);
+    text-decoration: none;
+    z-index: 100;
+    letter-spacing: 0.1em;
+    transition: color 0.2s ease;
+  }
+  .back:hover { color: var(--gold); }
+
+  @media (max-width: 768px) {
+    .page { padding: 0 1.5rem; }
+    .wi-row { flex-direction: column; gap: 0.5rem; }
+    .wi-desc { text-align: left; max-width: none; }
+    .connect-grid { grid-template-columns: 1fr; }
+    .connect-cell { border-right: none; border-bottom: 1px solid var(--dim); }
+    .connect-cell:last-child { border-bottom: none; }
+    .section { padding: 5rem 0; }
+  }
+</style>
+</head>
+<body>
+
+<a href="/" class="back">&larr; Prototypes</a>
+
+<div class="page">
+  <section class="hero">
+    <h1 class="hero-name">Kona</h1>
+    <div class="hero-line"></div>
+    <div class="hero-meta">
+      <span>Developer &amp; Maker</span>
+      <span>kcodes.me</span>
+    </div>
+  </section>
+
+  <section class="section" id="work">
+    <div class="section-label">Selected Work</div>
+    <a href="https://blog.kcodes.me" target="_blank" class="work-item">
+      <div class="wi-row">
+        <span class="wi-name">Blog</span>
+        <span class="wi-desc">Thoughts, notes, and occasional rants</span>
+      </div>
+    </a>
+    <a href="https://films.kcodes.me" target="_blank" class="work-item">
+      <div class="wi-row">
+        <span class="wi-name">Films</span>
+        <span class="wi-desc">A catalog of everything I've watched</span>
+      </div>
+    </a>
+    <a href="/labs" class="work-item">
+      <div class="wi-row">
+        <span class="wi-name">Labs</span>
+        <span class="wi-desc">Projects, experiments, and happy accidents</span>
+      </div>
+    </a>
+  </section>
+
+  <section class="section" id="about">
+    <div class="section-label">About</div>
+    <p class="about-text">
+      Self-taught developer <span class="dim">who learned by</span> <span class="gold">breaking things</span><span class="dim">.</span> Film nerd, music lover, history enthusiast. <span class="dim">Also a protogen.</span>
+    </p>
+    <p class="philosophy">"Ship it raw. Done > perfect."</p>
+  </section>
+
+  <section class="section" id="connect">
+    <div class="section-label">Connect</div>
+    <div class="connect-grid">
+      <a href="https://github.com/konacodes" target="_blank" class="connect-cell">
+        <div class="cc-name">GitHub</div>
+        <div class="cc-sub">Code</div>
+      </a>
+      <a href="https://discord.com/users/1151230208783945818" target="_blank" class="connect-cell">
+        <div class="cc-name">Discord</div>
+        <div class="cc-sub">Chat</div>
+      </a>
+      <a href="mailto:hello@kcodes.me" class="connect-cell">
+        <div class="cc-name">Email</div>
+        <div class="cc-sub">hello@kcodes.me</div>
+      </a>
+    </div>
+    <div class="pages-row">
+      <a href="/now" class="page-link">Now</a>
+      <a href="/uses" class="page-link">Uses</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>2025</span>
+    <span>Made with questionable sleep habits</span>
+  </footer>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

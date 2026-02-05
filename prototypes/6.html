@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kona — 06</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,300;1,9..144,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #faf6ef;
+    --sand: #f0e8d8;
+    --terracotta: #c4603a;
+    --clay: #a0522d;
+    --warm-dark: #2a1f15;
+    --warm-mid: #6b5a48;
+    --warm-light: #a09080;
+    --gold: #c9a66b;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Outfit', system-ui, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body {
+    font-family: var(--body);
+    background: var(--cream);
+    color: var(--warm-dark);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--terracotta); color: white; }
+
+  /* Grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* === HERO === */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 2rem;
+  }
+
+  /* Layered warm shapes */
+  .shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shape-1 {
+    width: 500px;
+    height: 500px;
+    background: rgba(196, 96, 58, 0.08);
+    top: 10%;
+    left: 15%;
+    animation: drift1 12s ease-in-out infinite;
+  }
+
+  .shape-2 {
+    width: 400px;
+    height: 400px;
+    background: rgba(201, 166, 107, 0.1);
+    bottom: 15%;
+    right: 10%;
+    animation: drift2 10s ease-in-out infinite;
+  }
+
+  .shape-3 {
+    width: 300px;
+    height: 300px;
+    background: rgba(160, 82, 45, 0.06);
+    top: 40%;
+    right: 30%;
+    animation: drift3 14s ease-in-out infinite;
+  }
+
+  @keyframes drift1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, -20px); }
+  }
+  @keyframes drift2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-20px, 15px); }
+  }
+  @keyframes drift3 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(15px, 25px); }
+  }
+
+  .hero-center {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    animation: warmIn 1s var(--ease) 0.2s forwards;
+  }
+
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(5rem, 14vw, 10rem);
+    font-weight: 300;
+    font-optical-sizing: auto;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--warm-dark);
+  }
+
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--warm-light);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  @keyframes warmIn {
+    from { opacity: 0; transform: scale(0.96) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* === CONTENT PANELS === */
+  .panels {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .panel {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow:
+      0 2px 4px rgba(42, 31, 21, 0.02),
+      0 8px 24px rgba(42, 31, 21, 0.04),
+      0 24px 48px rgba(42, 31, 21, 0.03);
+    transition: all 0.5s var(--ease);
+    opacity: 0;
+    transform: translateY(30px);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  a.panel:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 4px 8px rgba(42, 31, 21, 0.04),
+      0 16px 40px rgba(42, 31, 21, 0.08),
+      0 40px 80px rgba(42, 31, 21, 0.06);
+  }
+
+  a.panel:hover .panel-title {
+    color: var(--terracotta);
+  }
+
+  /* Panel sizes */
+  .panel-hero-card {
+    grid-column: span 2;
+    background: var(--warm-dark);
+    color: var(--cream);
+    padding: 3.5rem;
+  }
+
+  .panel-hero-card .panel-label { color: var(--warm-mid); }
+  .panel-hero-card .panel-body { color: rgba(250, 246, 239, 0.6); }
+  .panel-hero-card .panel-body .hl { color: var(--gold); }
+
+  .panel-wide { grid-column: span 2; }
+  .panel-accent {
+    background: linear-gradient(145deg, var(--terracotta), var(--clay));
+    color: white;
+  }
+
+  .panel-accent .panel-label { color: rgba(255,255,255,0.5); }
+
+  /* Panel content */
+  .panel-label {
+    font-family: var(--body);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--warm-light);
+    margin-bottom: 1.5rem;
+  }
+
+  .panel-title {
+    font-family: var(--display);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
+  }
+
+  .panel-desc {
+    font-size: 0.85rem;
+    color: var(--warm-light);
+    line-height: 1.6;
+  }
+
+  .panel-body {
+    font-family: var(--display);
+    font-size: 1.2rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--warm-mid);
+  }
+
+  .panel-body .hl {
+    color: var(--terracotta);
+    font-weight: 400;
+  }
+
+  /* Philosophy panel */
+  .panel-accent blockquote {
+    font-family: var(--display);
+    font-size: 1.3rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.8;
+  }
+
+  /* Connect panel */
+  .connect-row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .connect-item {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease;
+  }
+
+  .connect-item:hover { color: var(--terracotta); }
+
+  .ci-name {
+    font-family: var(--display);
+    font-size: 1.2rem;
+    font-weight: 400;
+  }
+
+  .ci-sub {
+    font-size: 0.7rem;
+    color: var(--warm-light);
+    margin-top: 0.1rem;
+  }
+
+  .panel-pages {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(42, 31, 21, 0.06);
+  }
+
+  .panel-pages a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-light);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .panel-pages a:hover { color: var(--terracotta); }
+
+  /* Footer */
+  .page-footer {
+    text-align: center;
+    padding-bottom: 3rem;
+    font-size: 0.7rem;
+    color: var(--warm-light);
+    opacity: 0;
+    animation: warmIn 0.8s var(--ease) 1s forwards;
+  }
+
+  /* Back */
+  .back {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    font-size: 0.75rem;
+    color: var(--warm-light);
+    text-decoration: none;
+    z-index: 100;
+    transition: color 0.2s ease;
+  }
+  .back:hover { color: var(--terracotta); }
+
+  @media (max-width: 768px) {
+    .panels { grid-template-columns: 1fr; }
+    .panel-hero-card, .panel-wide { grid-column: span 1; }
+    .hero-name { font-size: 5rem; }
+  }
+</style>
+</head>
+<body>
+
+<a href="/" class="back">&larr; Prototypes</a>
+
+<section class="hero">
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+  <div class="hero-center">
+    <h1 class="hero-name">Kona</h1>
+    <p class="hero-sub">Developer &amp; Maker</p>
+  </div>
+</section>
+
+<div class="panels">
+  <div class="panel panel-hero-card">
+    <div class="panel-label">About</div>
+    <p class="panel-body">
+      Self-taught developer who learned by <span class="hl">breaking things</span>. Film nerd, music lover, history enthusiast. Also a protogen.
+    </p>
+  </div>
+
+  <a href="https://blog.kcodes.me" target="_blank" class="panel">
+    <div class="panel-label">Writing</div>
+    <div class="panel-title">Blog</div>
+    <p class="panel-desc">Thoughts, notes, and occasional rants about building for the web.</p>
+  </a>
+
+  <a href="https://films.kcodes.me" target="_blank" class="panel">
+    <div class="panel-label">Catalog</div>
+    <div class="panel-title">Films</div>
+    <p class="panel-desc">A catalog of everything I've watched.</p>
+  </a>
+
+  <a href="/labs" class="panel">
+    <div class="panel-label">Projects</div>
+    <div class="panel-title">Labs</div>
+    <p class="panel-desc">Experiments and happy accidents.</p>
+  </a>
+
+  <div class="panel panel-accent">
+    <div class="panel-label">Philosophy</div>
+    <blockquote>"Ship it raw. Done&nbsp;>&nbsp;perfect."</blockquote>
+  </div>
+
+  <div class="panel panel-wide">
+    <div class="panel-label">Connect</div>
+    <div class="connect-row">
+      <a href="https://github.com/konacodes" target="_blank" class="connect-item">
+        <div class="ci-name">GitHub</div>
+        <div class="ci-sub">Code</div>
+      </a>
+      <a href="https://discord.com/users/1151230208783945818" target="_blank" class="connect-item">
+        <div class="ci-name">Discord</div>
+        <div class="ci-sub">Chat</div>
+      </a>
+      <a href="mailto:hello@kcodes.me" class="connect-item">
+        <div class="ci-name">Email</div>
+        <div class="ci-sub">hello@kcodes.me</div>
+      </a>
+    </div>
+    <div class="panel-pages">
+      <a href="/now">Now</a>
+      <a href="/uses">Uses</a>
+    </div>
+  </div>
+</div>
+
+<p class="page-footer">2025 &middot; Made with questionable sleep habits</p>
+
+<script>
+  const panels = document.querySelectorAll('.panel');
+  let delay = 0;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.transitionDelay = `${delay}ms`;
+        e.target.classList.add('visible');
+        delay += 80;
+        setTimeout(() => delay = 0, 500);
+      }
+    });
+  }, { threshold: 0.1 });
+  panels.forEach(p => obs.observe(p));
+</script>
+</body>
+</html>

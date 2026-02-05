@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kona — 05</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #faf8f4;
+    --ink: #0a0a09;
+    --ink-50: rgba(10, 10, 9, 0.5);
+    --ink-20: rgba(10, 10, 9, 0.2);
+    --ink-08: rgba(10, 10, 9, 0.08);
+    --ink-04: rgba(10, 10, 9, 0.04);
+    --accent: #8b6914;
+    --grid: rgba(10, 10, 9, 0.04);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body {
+    font-family: var(--serif);
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: white; }
+
+  /* Visible grid system */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(90deg, var(--grid) 0, var(--grid) 1px, transparent 1px, transparent),
+      repeating-linear-gradient(0deg, var(--grid) 0, var(--grid) 1px, transparent 1px, transparent);
+    background-size: calc(100% / 12) 100%, 100% 80px;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* === HEADER === */
+  .header {
+    padding: 6rem 0 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: end;
+  }
+
+  .header-left {
+    opacity: 0;
+    animation: archiveIn 0.8s var(--ease) 0.2s forwards;
+  }
+
+  .header-index {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-20);
+    margin-bottom: 1rem;
+  }
+
+  .header-name {
+    font-family: var(--serif);
+    font-size: clamp(5rem, 12vw, 8rem);
+    font-weight: 300;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+  }
+
+  .header-right {
+    padding-bottom: 0.5rem;
+    opacity: 0;
+    animation: archiveIn 0.8s var(--ease) 0.4s forwards;
+  }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    line-height: 2.2;
+    color: var(--ink-50);
+  }
+
+  .header-meta span {
+    color: var(--ink-20);
+  }
+
+  .header-rule {
+    height: 1px;
+    background: var(--ink);
+    opacity: 0;
+    animation: archiveIn 0.8s var(--ease) 0.6s forwards;
+  }
+
+  @keyframes archiveIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === SPECIMEN SECTIONS === */
+  .specimen {
+    padding: 5rem 0;
+    border-bottom: 1px solid var(--ink-08);
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 4rem;
+    align-items: start;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.7s var(--ease);
+  }
+
+  .specimen.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .spec-sidebar {
+    position: sticky;
+    top: 5rem;
+  }
+
+  .spec-index {
+    font-family: var(--serif);
+    font-size: 6rem;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--ink-08);
+    margin-bottom: 1rem;
+  }
+
+  .spec-label {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-20);
+    line-height: 2;
+  }
+
+  .spec-body {
+    padding-top: 1rem;
+  }
+
+  /* Work items */
+  .archive-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: baseline;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--ink-04);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.35s var(--ease);
+  }
+
+  .archive-item:first-child {
+    border-top: 1px solid var(--ink-04);
+  }
+
+  .archive-item:hover {
+    padding-left: 1rem;
+  }
+
+  .archive-item:hover .ai-title {
+    color: var(--accent);
+  }
+
+  .ai-title {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 400;
+    transition: color 0.3s ease;
+    line-height: 1.2;
+  }
+
+  .ai-meta {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--ink-20);
+    text-align: right;
+    line-height: 1.8;
+    white-space: nowrap;
+  }
+
+  .ai-desc {
+    font-size: 1rem;
+    color: var(--ink-50);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  /* About */
+  .about-text {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .about-text .light {
+    color: var(--ink-20);
+  }
+
+  .about-text .accent {
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .philosophy-box {
+    margin-top: 3rem;
+    padding: 2rem;
+    border: 1px solid var(--ink-08);
+    position: relative;
+  }
+
+  .philosophy-box .pb-label {
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    background: var(--bg);
+    padding: 0 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-20);
+  }
+
+  .philosophy-box blockquote {
+    font-size: 1.2rem;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink-50);
+  }
+
+  /* Connect */
+  .connect-specimens {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--ink-08);
+  }
+
+  .connect-spec {
+    padding: 2.5rem 2rem;
+    border-right: 1px solid var(--ink-08);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s var(--ease);
+  }
+
+  .connect-spec:last-child { border-right: none; }
+
+  .connect-spec:hover {
+    background: var(--ink-04);
+  }
+
+  .connect-spec:hover .cs-name {
+    color: var(--accent);
+  }
+
+  .cs-index {
+    font-family: var(--mono);
+    font-size: 0.5rem;
+    color: var(--ink-20);
+    letter-spacing: 0.15em;
+    margin-bottom: 1.5rem;
+  }
+
+  .cs-name {
+    font-size: 1.4rem;
+    font-weight: 400;
+    transition: color 0.3s ease;
+    margin-bottom: 0.25rem;
+  }
+
+  .cs-detail {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--ink-20);
+  }
+
+  /* Pages */
+  .pages-bar {
+    display: flex;
+    border: 1px solid var(--ink-08);
+    border-top: none;
+  }
+
+  .pages-bar a {
+    flex: 1;
+    padding: 1.25rem 2rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-20);
+    text-decoration: none;
+    border-right: 1px solid var(--ink-08);
+    transition: all 0.2s ease;
+  }
+
+  .pages-bar a:last-child { border-right: none; }
+  .pages-bar a:hover { color: var(--accent); background: var(--ink-04); }
+
+  /* Footer */
+  .archive-footer {
+    padding: 3rem 0;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 4rem;
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    color: var(--ink-20);
+    letter-spacing: 0.1em;
+  }
+
+  /* Back */
+  .back {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--ink-20);
+    text-decoration: none;
+    z-index: 100;
+    letter-spacing: 0.1em;
+    transition: color 0.2s ease;
+  }
+  .back:hover { color: var(--accent); }
+
+  @media (max-width: 768px) {
+    .header { grid-template-columns: 1fr; gap: 2rem; }
+    .specimen { grid-template-columns: 1fr; gap: 1rem; }
+    .spec-sidebar { position: static; display: flex; align-items: baseline; gap: 1rem; }
+    .spec-index { font-size: 3rem; margin-bottom: 0; }
+    .archive-item { grid-template-columns: 1fr; gap: 0.5rem; }
+    .ai-meta { text-align: left; }
+    .connect-specimens { grid-template-columns: 1fr; }
+    .connect-spec { border-right: none; border-bottom: 1px solid var(--ink-08); }
+    .connect-spec:last-child { border-bottom: none; }
+    .archive-footer { grid-template-columns: 1fr; gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<a href="/" class="back">&larr; Prototypes</a>
+
+<div class="page">
+  <header class="header">
+    <div class="header-left">
+      <div class="header-index">REF — 001</div>
+      <h1 class="header-name">Kona</h1>
+    </div>
+    <div class="header-right">
+      <div class="header-meta">
+        <span>TYPE</span> Developer &amp; Maker<br>
+        <span>LOCATION</span> The Internet<br>
+        <span>STATUS</span> Available for projects<br>
+        <span>DOMAIN</span> kcodes.me
+      </div>
+    </div>
+  </header>
+  <div class="header-rule"></div>
+
+  <section class="specimen" id="work">
+    <div class="spec-sidebar">
+      <div class="spec-index">01</div>
+      <div class="spec-label">
+        Work<br>
+        <span style="color: var(--ink-08);">3 entries</span>
+      </div>
+    </div>
+    <div class="spec-body">
+      <a href="https://blog.kcodes.me" target="_blank" class="archive-item">
+        <div>
+          <div class="ai-title">Blog</div>
+          <div class="ai-desc">Thoughts, notes, and occasional rants</div>
+        </div>
+        <div class="ai-meta">TYPE Writing<br>STATUS Active</div>
+      </a>
+      <a href="https://films.kcodes.me" target="_blank" class="archive-item">
+        <div>
+          <div class="ai-title">Films</div>
+          <div class="ai-desc">A catalog of everything I've watched</div>
+        </div>
+        <div class="ai-meta">TYPE Catalog<br>STATUS Active</div>
+      </a>
+      <a href="/labs" class="archive-item">
+        <div>
+          <div class="ai-title">Labs</div>
+          <div class="ai-desc">Projects, experiments, and happy accidents</div>
+        </div>
+        <div class="ai-meta">TYPE Projects<br>STATUS Active</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="specimen" id="about">
+    <div class="spec-sidebar">
+      <div class="spec-index">02</div>
+      <div class="spec-label">About</div>
+    </div>
+    <div class="spec-body">
+      <p class="about-text">
+        Self-taught developer <span class="light">who learned by</span> <span class="accent">breaking things</span><span class="light">.</span> Film nerd, music lover, history enthusiast. <span class="light">Also a protogen.</span>
+      </p>
+      <div class="philosophy-box">
+        <span class="pb-label">Philosophy</span>
+        <blockquote>"Ship it raw. Done > perfect."</blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="specimen" id="connect">
+    <div class="spec-sidebar">
+      <div class="spec-index">03</div>
+      <div class="spec-label">Connect</div>
+    </div>
+    <div class="spec-body">
+      <div class="connect-specimens">
+        <a href="https://github.com/konacodes" target="_blank" class="connect-spec">
+          <div class="cs-index">03.A</div>
+          <div class="cs-name">GitHub</div>
+          <div class="cs-detail">@konacodes</div>
+        </a>
+        <a href="https://discord.com/users/1151230208783945818" target="_blank" class="connect-spec">
+          <div class="cs-index">03.B</div>
+          <div class="cs-name">Discord</div>
+          <div class="cs-detail">Direct message</div>
+        </a>
+        <a href="mailto:hello@kcodes.me" class="connect-spec">
+          <div class="cs-index">03.C</div>
+          <div class="cs-name">Email</div>
+          <div class="cs-detail">hello@kcodes.me</div>
+        </a>
+      </div>
+      <div class="pages-bar">
+        <a href="/now">Now</a>
+        <a href="/uses">Uses</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="archive-footer">
+    <span>&copy; 2025</span>
+    <span>Made with questionable sleep habits</span>
+  </footer>
+</div>
+
+<script>
+  const specimens = document.querySelectorAll('.specimen');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  specimens.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kona — 07</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0908;
+    --surface: #111110;
+    --text: #d8d4ce;
+    --text-50: rgba(216, 212, 206, 0.5);
+    --text-20: rgba(216, 212, 206, 0.2);
+    --text-08: rgba(216, 212, 206, 0.08);
+    --gold: #c9a66b;
+    --gold-dim: rgba(201, 166, 107, 0.15);
+    --display: 'Bodoni Moda', Georgia, serif;
+    --sans: 'Space Grotesk', system-ui, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--gold); color: var(--bg); }
+
+  /* Film grain - more prominent */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 0.3s steps(3) infinite;
+  }
+
+  @keyframes grainShift {
+    0% { transform: translate(0, 0); }
+    33% { transform: translate(-1px, 1px); }
+    66% { transform: translate(1px, -1px); }
+  }
+
+  /* Letterbox bars */
+  .letterbox-top, .letterbox-bottom {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 4vh;
+    background: #000;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .letterbox-top { top: 0; }
+  .letterbox-bottom { bottom: 0; }
+
+  /* Scan line */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.015) 2px,
+      rgba(0,0,0,0.015) 4px
+    );
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 4vh 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* === HERO === */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 8vh 0;
+  }
+
+  /* Ambient light leak */
+  .light-leak {
+    position: absolute;
+    width: 600px;
+    height: 200px;
+    background: radial-gradient(ellipse, var(--gold-dim), transparent 70%);
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(100px);
+    pointer-events: none;
+    opacity: 0;
+    animation: leakIn 2s ease 0.5s forwards;
+  }
+
+  @keyframes leakIn {
+    to { opacity: 1; }
+  }
+
+  .hero-pre {
+    font-size: 0.6rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--text-20);
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: cinIn 1s var(--ease) 0.3s forwards;
+  }
+
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(6rem, 18vw, 14rem);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    line-height: 0.8;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: cinIn 1.2s var(--ease) 0.5s forwards;
+  }
+
+  .hero-name .thin {
+    font-weight: 400;
+    color: var(--text-50);
+  }
+
+  .hero-post {
+    margin-top: 3rem;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--text-20);
+    opacity: 0;
+    animation: cinIn 1s var(--ease) 0.9s forwards;
+  }
+
+  @keyframes cinIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === SECTIONS === */
+  .cin-section {
+    padding: 6rem 0;
+    border-top: 1px solid var(--text-08);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s var(--ease);
+  }
+
+  .cin-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .cin-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--text-20);
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  /* Work - dramatic list */
+  .cin-work {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cin-link {
+    text-decoration: none;
+    color: var(--text);
+    text-align: center;
+    padding: 2.5rem 0;
+    width: 100%;
+    border-bottom: 1px solid var(--text-08);
+    transition: all 0.4s var(--ease);
+  }
+
+  .cin-link:first-child {
+    border-top: 1px solid var(--text-08);
+  }
+
+  .cin-link:hover .cl-title {
+    color: var(--gold);
+    letter-spacing: 0.08em;
+  }
+
+  .cl-title {
+    font-family: var(--display);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 400;
+    transition: all 0.5s var(--ease);
+    letter-spacing: 0.02em;
+  }
+
+  .cl-sub {
+    font-size: 0.75rem;
+    color: var(--text-20);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  /* About */
+  .cin-about {
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  .cin-about-text {
+    font-family: var(--display);
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--text-50);
+  }
+
+  .cin-about-text .bright {
+    color: var(--text);
+  }
+
+  .cin-about-text .gold {
+    color: var(--gold);
+  }
+
+  .cin-quote {
+    margin-top: 3rem;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--text-20);
+  }
+
+  /* Connect */
+  .cin-connect {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    flex-wrap: wrap;
+  }
+
+  .cin-connect a {
+    text-decoration: none;
+    color: var(--text-50);
+    text-align: center;
+    transition: color 0.3s ease;
+  }
+
+  .cin-connect a:hover {
+    color: var(--gold);
+  }
+
+  .cin-connect .cc-name {
+    font-family: var(--display);
+    font-size: 1.4rem;
+    font-weight: 400;
+  }
+
+  .cin-connect .cc-type {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-20);
+    margin-top: 0.25rem;
+  }
+
+  .cin-pages {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--text-08);
+  }
+
+  .cin-pages a {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-20);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .cin-pages a:hover { color: var(--gold); }
+
+  /* Footer */
+  .cin-footer {
+    text-align: center;
+    padding: 4rem 0 2rem;
+    border-top: 1px solid var(--text-08);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--text-20);
+  }
+
+  /* Back */
+  .back {
+    position: fixed;
+    top: calc(4vh + 1.5rem);
+    left: 2rem;
+    font-size: 0.65rem;
+    color: var(--text-20);
+    text-decoration: none;
+    z-index: 1001;
+    letter-spacing: 0.1em;
+    transition: color 0.2s ease;
+  }
+  .back:hover { color: var(--gold); }
+
+  @media (max-width: 768px) {
+    .hero-name { font-size: 5rem; }
+    .cin-connect { gap: 2rem; }
+    .letterbox-top, .letterbox-bottom { height: 2vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="letterbox-top"></div>
+<div class="letterbox-bottom"></div>
+<a href="/" class="back">&larr; Prototypes</a>
+
+<div class="page">
+  <section class="hero">
+    <div class="light-leak"></div>
+    <div class="hero-pre">A Film by</div>
+    <h1 class="hero-name">K<span class="thin">ona</span></h1>
+    <p class="hero-post">Developer &amp; Maker</p>
+  </section>
+
+  <section class="cin-section">
+    <div class="cin-label">Featured</div>
+    <div class="cin-work">
+      <a href="https://blog.kcodes.me" target="_blank" class="cin-link">
+        <div class="cl-title">Blog</div>
+        <div class="cl-sub">Thoughts, notes, and occasional rants</div>
+      </a>
+      <a href="https://films.kcodes.me" target="_blank" class="cin-link">
+        <div class="cl-title">Films</div>
+        <div class="cl-sub">A catalog of everything I've watched</div>
+      </a>
+      <a href="/labs" class="cin-link">
+        <div class="cl-title">Labs</div>
+        <div class="cl-sub">Projects, experiments, and happy accidents</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="cin-section">
+    <div class="cin-label">About</div>
+    <div class="cin-about">
+      <p class="cin-about-text">
+        <span class="bright">Self-taught developer</span> who learned by <span class="gold">breaking things</span>. Film nerd, music lover, history enthusiast. Also a protogen.
+      </p>
+      <p class="cin-quote">"Ship it raw. Done > perfect."</p>
+    </div>
+  </section>
+
+  <section class="cin-section">
+    <div class="cin-label">Connect</div>
+    <div class="cin-connect">
+      <a href="https://github.com/konacodes" target="_blank">
+        <div class="cc-name">GitHub</div>
+        <div class="cc-type">Code</div>
+      </a>
+      <a href="https://discord.com/users/1151230208783945818" target="_blank">
+        <div class="cc-name">Discord</div>
+        <div class="cc-type">Chat</div>
+      </a>
+      <a href="mailto:hello@kcodes.me">
+        <div class="cc-name">Email</div>
+        <div class="cc-type">hello@kcodes.me</div>
+      </a>
+    </div>
+    <div class="cin-pages">
+      <a href="/now">Now</a>
+      <a href="/uses">Uses</a>
+    </div>
+  </section>
+
+  <footer class="cin-footer">2025 &middot; Made with questionable sleep habits</footer>
+</div>
+
+<script>
+  const secs = document.querySelectorAll('.cin-section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  secs.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
