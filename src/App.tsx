@@ -169,31 +169,6 @@ function Spotlight() {
 }
 
 // ============================================
-// Time Display
-// ============================================
-function TimeDisplay() {
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatted = time.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
-  return (
-    <time className="dateline" dateTime={time.toISOString()}>
-      {formatted}
-    </time>
-  );
-}
-
-// ============================================
 // Now Page
 // ============================================
 function NowPage() {
@@ -457,130 +432,125 @@ function LabsPage() {
 // ============================================
 // Home Page
 // ============================================
+// ============================================
+// Intersection Observer Hook for Collage Pieces
+// ============================================
+function useInView() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) setVisible(true); },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return { ref, visible };
+}
+
+function CollagePiece({ className, delay, children }: {
+  className: string;
+  delay?: number;
+  children: React.ReactNode;
+}) {
+  const { ref, visible } = useInView();
+  return (
+    <div
+      ref={ref}
+      className={`piece ${className} ${visible ? 'visible' : ''}`}
+      style={delay ? { transitionDelay: `${delay}ms` } as React.CSSProperties : undefined}
+    >
+      {children}
+    </div>
+  );
+}
+
 function HomePage() {
   const { theme } = useTheme();
-  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-
-  const links = [
-    {
-      id: 'blog',
-      title: 'Blog',
-      subtitle: 'Thoughts, notes, and occasional rants',
-      href: 'https://blog.kcodes.me',
-    },
-    {
-      id: 'films',
-      title: 'Films',
-      subtitle: 'A catalog of everything I\'ve watched',
-      href: 'https://films.kcodes.me',
-    },
-    {
-      id: 'labs',
-      title: 'Labs',
-      subtitle: 'Projects, experiments, and happy accidents',
-      href: '/labs',
-    },
-  ];
-
-  const socials = [
-    { name: 'GitHub', href: 'https://github.com/konacodes' },
-    { name: 'Discord', href: 'https://discord.com/users/1151230208783945818' },
-    { name: 'Email', href: 'mailto:hello@kcodes.me' },
-  ];
-
-  const pages = [
-    { name: 'Now', href: '/now' },
-    { name: 'Uses', href: '/uses' },
-  ];
 
   return (
-    <div className="page">
+    <div className="page collage-page">
       <FluidBackground key={`fluid-home-${theme}`} />
       <Spotlight />
       <ThemeToggle />
 
-      <header className="masthead">
-        <div className="masthead-rule" />
-        <h1 className="masthead-title">Kona</h1>
-        <p className="masthead-tagline">creative developer</p>
-        <div className="masthead-rule" />
-        <TimeDisplay />
+      <header className="collage-hero">
+        <div className="hero-shape" aria-hidden="true" />
+        <h1 className="collage-hero-name">Kona</h1>
       </header>
 
-      <main className="content">
-        <nav className="headlines">
-          {links.map((link, index) => (
-            <a
-              key={link.id}
-              href={link.href}
-              className={`headline ${hoveredLink && hoveredLink !== link.id ? 'faded' : ''}`}
-              target={link.href.startsWith('http') ? '_blank' : undefined}
-              rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              onMouseEnter={() => setHoveredLink(link.id)}
-              onMouseLeave={() => setHoveredLink(null)}
-              style={{ '--delay': `${index * 0.1}s` } as React.CSSProperties}
-            >
-              <h2 className="headline-title">{link.title}</h2>
-              <p className="headline-subtitle">{link.subtitle}</p>
+      <main className="pieces">
+        <CollagePiece className="piece-blog" delay={0}>
+          <a href="https://blog.kcodes.me" target="_blank" rel="noopener noreferrer" className="card">
+            <div className="card-label">Writing</div>
+            <h2 className="card-name">Blog</h2>
+            <p className="card-desc">Thoughts, notes, and occasional rants about building things on the web.</p>
+          </a>
+        </CollagePiece>
+
+        <CollagePiece className="piece-films" delay={80}>
+          <a href="https://films.kcodes.me" target="_blank" rel="noopener noreferrer" className="card">
+            <div className="card-label">Catalog</div>
+            <h2 className="card-name">Films</h2>
+            <p className="card-desc">A catalog of everything I've watched</p>
+          </a>
+        </CollagePiece>
+
+        <CollagePiece className="piece-labs" delay={160}>
+          <a href="/labs" className="card">
+            <div className="card-label">Projects</div>
+            <h2 className="card-name">Labs</h2>
+            <p className="card-desc">Experiments and happy accidents</p>
+          </a>
+        </CollagePiece>
+
+        <CollagePiece className="piece-about" delay={100}>
+          <div className="card card-about">
+            <div className="card-label">About</div>
+            <p>Self-taught developer who learned by <em>breaking things</em>. Film nerd, music lover, history enthusiast. Also a protogen.</p>
+          </div>
+        </CollagePiece>
+
+        <CollagePiece className="piece-philosophy" delay={180}>
+          <div className="card card-philosophy">
+            <blockquote>"Ship it raw.<br />Done&nbsp;&gt;&nbsp;perfect."</blockquote>
+          </div>
+        </CollagePiece>
+
+        <CollagePiece className="piece-connect" delay={120}>
+          <div className="card">
+            <div className="card-label">Connect</div>
+            <ul className="connect-list">
+              <li><a href="https://github.com/konacodes" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              <li><a href="https://discord.com/users/1151230208783945818" target="_blank" rel="noopener noreferrer">Discord</a></li>
+              <li><a href="mailto:hello@kcodes.me">hello@kcodes.me</a></li>
+            </ul>
+          </div>
+        </CollagePiece>
+
+        <CollagePiece className="piece-pages" delay={200}>
+          <div className="pages-row">
+            <a href="/now" className="page-chip">
+              <div className="chip-name">Now</div>
+              <div className="chip-sub">What I'm up to</div>
             </a>
-          ))}
-        </nav>
-
-        <aside className="sidebar">
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">About</h3>
-            <p className="sidebar-text">
-              Self-taught developer who learned by breaking things.
-              Film nerd, music lover, history enthusiast.
-              Also a protogen.
-            </p>
+            <a href="/uses" className="page-chip">
+              <div className="chip-name">Uses</div>
+              <div className="chip-sub">Tools &amp; setup</div>
+            </a>
           </div>
-
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">Philosophy</h3>
-            <p className="sidebar-text italic">
-              "Ship it raw. Done &gt; perfect."
-            </p>
-          </div>
-
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">More</h3>
-            <ul className="sidebar-links">
-              {pages.map((page) => (
-                <li key={page.name}>
-                  <a href={page.href} className="sidebar-link">
-                    {page.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">Connect</h3>
-            <ul className="sidebar-links">
-              {socials.map((social) => (
-                <li key={social.name}>
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="sidebar-link"
-                  >
-                    {social.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+        </CollagePiece>
       </main>
 
-      <footer className="footer">
-        <div className="footer-rule" />
+      <footer className="footer collage-footer">
         <p className="footer-text">
           <span className="footer-year">{new Date().getFullYear()}</span>
-          <span className="footer-divider">·</span>
+          <span className="footer-divider">&middot;</span>
           <span>Made with questionable sleep habits</span>
         </p>
       </footer>
