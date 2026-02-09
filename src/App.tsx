@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, createContext, useContext, useCallback } from "react";
 import "./index.css";
-import { FluidBackground } from "./FluidBackground";
 
 // ============================================
 // Theme Context
@@ -123,50 +122,6 @@ function ThemeToggle() {
   );
 }
 
-// ============================================
-// Spotlight Effect - The Signature Element
-// ============================================
-function Spotlight() {
-  const spotlightRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const spotlight = spotlightRef.current;
-    if (!spotlight) return;
-
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let currentX = mouseX;
-    let currentY = mouseY;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
-
-    const animate = () => {
-      currentX += (mouseX - currentX) * 0.08;
-      currentY += (mouseY - currentY) * 0.08;
-
-      spotlight.style.setProperty('--x', `${currentX}px`);
-      spotlight.style.setProperty('--y', `${currentY}px`);
-
-      requestAnimationFrame(animate);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    animate();
-
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  return (
-    <div
-      ref={spotlightRef}
-      className="spotlight"
-      aria-hidden="true"
-    />
-  );
-}
 
 // ============================================
 // Now Page
@@ -175,8 +130,6 @@ function NowPage() {
   const { theme } = useTheme();
   return (
     <div className="page">
-      <FluidBackground key={`fluid-now-${theme}`} subtle />
-      <Spotlight />
       <ThemeToggle />
 
       <header className="subpage-header">
@@ -290,8 +243,6 @@ function UsesPage() {
 
   return (
     <div className="page">
-      <FluidBackground key={`fluid-uses-${theme}`} subtle />
-      <Spotlight />
       <ThemeToggle />
 
       <header className="subpage-header">
@@ -373,7 +324,7 @@ function LabsPage() {
     {
       id: 'this-site',
       title: 'This Site',
-      description: 'The editorial-style portfolio you\'re looking at right now. Spotlight follows your cursor.',
+      description: 'The portfolio site you\'re looking at right now. Warm collage layout.',
       tech: ['React', 'Vite', 'Vibes'],
       href: 'https://github.com/konacodes/konacodes',
       status: 'active'
@@ -382,8 +333,6 @@ function LabsPage() {
 
   return (
     <div className="page">
-      <FluidBackground key={`fluid-labs-${theme}`} subtle />
-      <Spotlight />
       <ThemeToggle />
 
       <header className="labs-header">
@@ -475,12 +424,9 @@ function HomePage() {
 
   return (
     <div className="page collage-page">
-      <FluidBackground key={`fluid-home-${theme}`} />
-      <Spotlight />
       <ThemeToggle />
 
       <header className="collage-hero">
-        <div className="hero-shape" aria-hidden="true" />
         <h1 className="collage-hero-name">Kona</h1>
       </header>
 

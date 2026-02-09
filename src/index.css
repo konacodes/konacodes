@@ -18,7 +18,6 @@
   --color-ink-lighter: #8a8a82;
   --color-rule: #d4d0c8;
   --color-accent: #c9a66b;
-  --color-spotlight: rgba(255, 248, 235, 0.15);
 
   /* Spacing */
   --space-xs: 0.5rem;
@@ -55,7 +54,6 @@
   --color-ink-lighter: #7a766f;
   --color-rule: #2a2826;
   --color-accent: #d4b078;
-  --color-spotlight: rgba(212, 176, 120, 0.08);
 
   /* Shadows - reduced opacity for dark mode */
   --shadow-sm:
@@ -98,9 +96,6 @@
   opacity: 0.02;
 }
 
-[data-theme="dark"] .spotlight {
-  display: none;
-}
 
 /* ============================================
    Base
@@ -143,37 +138,6 @@ body {
   position: relative;
 }
 
-/* ============================================
-   Spotlight - The Signature Element
-   ============================================ */
-.spotlight {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(
-    600px circle at var(--x, 50%) var(--y, 50%),
-    var(--color-spotlight),
-    transparent 40%
-  );
-  transition: opacity 0.3s ease;
-}
-
-/* ============================================
-   Fluid Background - Depth Shader
-   ============================================ */
-.fluid-background {
-  transition: opacity 0.8s ease;
-  image-rendering: auto;
-}
-
-[data-theme="light"] .fluid-background {
-  mix-blend-mode: multiply;
-}
-
-[data-theme="dark"] .fluid-background {
-  mix-blend-mode: screen;
-}
 
 /* Paper grain texture overlay */
 .page::before {
@@ -212,28 +176,6 @@ body {
   animation: fadeSlideUp 0.8s var(--ease-out) 0.2s backwards;
 }
 
-.hero-shape {
-  position: absolute;
-  top: 3rem;
-  right: 5%;
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  background: rgba(201, 166, 107, 0.15);
-  filter: blur(60px);
-  z-index: 0;
-  animation: breathe 6s ease-in-out infinite;
-  pointer-events: none;
-}
-
-[data-theme="dark"] .hero-shape {
-  background: rgba(212, 176, 120, 0.08);
-}
-
-@keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.1); opacity: 0.8; }
-}
 
 /* Collage grid - intentionally overlapping */
 .pieces {
@@ -484,7 +426,6 @@ a.card:hover .card-name {
   .piece { margin-top: 0 !important; transform: none !important; }
   .piece.visible { transform: none !important; }
   .collage-hero-name { font-size: 4rem; }
-  .hero-shape { width: 180px; height: 180px; right: 0; }
 }
 
 /* ============================================
@@ -1041,10 +982,6 @@ a.card:hover .card-name {
     transition-duration: 0.01ms !important;
   }
 
-  .spotlight {
-    display: none;
-  }
-
   .theme-splash {
     animation: none;
     clip-path: circle(150% at var(--splash-x) var(--splash-y));
@@ -1061,10 +998,6 @@ a.card:hover .card-name {
    Print Styles (for that extra editorial touch)
    ============================================ */
 @media print {
-  .spotlight {
-    display: none;
-  }
-
   .page {
     max-width: 100%;
     padding: 0;
