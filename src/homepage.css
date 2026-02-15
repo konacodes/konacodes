@@ -1,0 +1,501 @@
+/* ============================================
+   Homepage: Scatter Zine
+   Hero image starts complete, then shatters into
+   torn fragments scattered across the page.
+   Watercolor pieces bleed between content sections.
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Rubik+Mono+One&family=Caveat:wght@400;600;700&display=swap');
+
+/* --- Base --- */
+.cz-page {
+  --cz-paper: #f5f0e8;
+  --cz-ink: #1a1714;
+  --cz-red: #c94a3a;
+  --cz-blue: #2a5da8;
+  --cz-yellow: #e8c840;
+  --cz-pink: #e85d8a;
+  --cz-typewriter: 'Special Elite', monospace;
+  --cz-bold: 'Rubik Mono One', monospace;
+  --cz-hand: 'Caveat', cursive;
+
+  min-height: 100vh;
+  background: var(--cz-paper);
+  color: var(--cz-ink);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Paper grain */
+.cz-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Halftone dots */
+.cz-page::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.12) 1px, transparent 1px);
+  background-size: 6px 6px;
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+}
+
+/* --- Hero --- */
+.cz-hero {
+  position: relative;
+  padding: 4rem 2rem 2rem;
+  min-height: 70vh;
+  z-index: 1;
+}
+
+/* Complete image — shown first, then shatters */
+.cz-hero-complete {
+  display: block;
+  width: min(80vw, 600px);
+  margin: 0 auto;
+  position: relative;
+  z-index: 3;
+  transform: rotate(-3deg);
+  border: 4px solid white;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+  clip-path: polygon(
+    2% 3%, 5% 0%, 8% 2%, 15% 0%, 22% 1%, 30% 0%,
+    38% 2%, 46% 0%, 54% 1%, 62% 0%, 70% 2%, 78% 0%,
+    86% 1%, 94% 0%, 98% 2%, 100% 4%,
+    100% 96%, 98% 100%, 92% 98%, 85% 100%, 78% 99%,
+    70% 100%, 62% 98%, 54% 100%, 46% 99%, 38% 100%,
+    30% 98%, 22% 100%, 15% 99%, 8% 100%, 3% 98%,
+    0% 100%, 0% 4%
+  );
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out, filter 0.7s ease-out;
+}
+
+.cz-hero-complete.shattered {
+  opacity: 0;
+  transform: rotate(-3deg) scale(1.06);
+  filter: blur(5px);
+}
+
+/* --- Fragments container --- */
+.cz-frags {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cz-frags.active {
+  pointer-events: auto;
+}
+
+/* Individual fragments */
+.cz-frag {
+  position: absolute;
+  background-repeat: no-repeat;
+  border: 3px solid white;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.5s ease-out, transform 0.3s ease;
+}
+
+.cz-frag:hover {
+  z-index: 5;
+  transform: scale(1.05) rotate(0deg) !important;
+}
+
+.cz-frags.active .cz-frag { opacity: 1; }
+.cz-frags.active .cz-frag--1 { transition-delay: 0.05s; }
+.cz-frags.active .cz-frag--2 { transition-delay: 0.1s; }
+.cz-frags.active .cz-frag--3 { transition-delay: 0.15s; }
+.cz-frags.active .cz-frag--4 { transition-delay: 0.2s; }
+.cz-frags.active .cz-frag--5 { transition-delay: 0.25s; }
+
+/* Fragment 1: largest, center-left — main KONA text */
+.cz-frag--1 {
+  width: 52%;
+  height: 55%;
+  top: 5%;
+  left: 3%;
+  transform: rotate(-3deg);
+  clip-path: polygon(2% 4%, 95% 0%, 100% 93%, 5% 100%);
+  background-size: 200%;
+  background-position: 35% 30%;
+}
+
+/* Fragment 2: medium, top-right */
+.cz-frag--2 {
+  width: 40%;
+  height: 48%;
+  top: 0%;
+  right: 2%;
+  transform: rotate(4deg);
+  clip-path: polygon(5% 0%, 100% 3%, 96% 100%, 0% 96%);
+  background-size: 250%;
+  background-position: 72% 20%;
+}
+
+/* Fragment 3: small, bottom-left */
+.cz-frag--3 {
+  width: 30%;
+  height: 32%;
+  bottom: 8%;
+  left: 6%;
+  transform: rotate(-6deg);
+  clip-path: polygon(4% 0%, 100% 5%, 95% 100%, 0% 94%);
+  background-size: 340%;
+  background-position: 15% 75%;
+}
+
+/* Fragment 4: medium, bottom-right */
+.cz-frag--4 {
+  width: 34%;
+  height: 38%;
+  bottom: 3%;
+  right: 8%;
+  transform: rotate(2.5deg);
+  clip-path: polygon(0% 2%, 97% 0%, 100% 97%, 4% 100%);
+  background-size: 290%;
+  background-position: 80% 65%;
+}
+
+/* Fragment 5: small, center overlap */
+.cz-frag--5 {
+  width: 22%;
+  height: 26%;
+  top: 42%;
+  left: 40%;
+  transform: rotate(-8deg);
+  clip-path: polygon(5% 0%, 100% 4%, 93% 100%, 0% 94%);
+  background-size: 420%;
+  background-position: 48% 45%;
+  z-index: 2;
+}
+
+/* Watercolor wash pieces in hero */
+.cz-wash-piece {
+  position: absolute;
+  background-size: 250%;
+  background-repeat: no-repeat;
+  border: 2px solid white;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.08);
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.cz-frags.active .cz-wash-piece { opacity: 0.25; }
+
+.cz-wash-piece--1 {
+  width: 240px;
+  height: 160px;
+  bottom: -3%;
+  left: 30%;
+  transform: rotate(-4deg);
+  background-position: 40% 55%;
+  clip-path: polygon(3% 0%, 98% 4%, 100% 96%, 0% 100%);
+  transition-delay: 0.3s;
+}
+
+.cz-wash-piece--2 {
+  width: 200px;
+  height: 130px;
+  top: 10%;
+  right: -2%;
+  transform: rotate(6deg);
+  background-position: 70% 30%;
+  clip-path: polygon(0% 3%, 100% 0%, 97% 100%, 4% 96%);
+  transition-delay: 0.35s;
+}
+
+/* --- Ransom note --- */
+.cz-ransom {
+  text-align: center;
+  margin: 3rem 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cz-ransom-word {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  margin: 0.2rem;
+  font-size: clamp(1.4rem, 4vw, 2.5rem);
+  line-height: 1.3;
+}
+
+.cz-ransom-word:nth-child(1) {
+  font-family: var(--cz-bold);
+  background: var(--cz-ink);
+  color: var(--cz-paper);
+  transform: rotate(-2deg);
+}
+
+.cz-ransom-word:nth-child(2) {
+  font-family: var(--cz-hand);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  transform: rotate(1.5deg);
+  color: var(--cz-red);
+}
+
+.cz-ransom-word:nth-child(3) {
+  font-family: var(--cz-typewriter);
+  border: 2px solid var(--cz-ink);
+  transform: rotate(-1deg);
+}
+
+.cz-ransom-word:nth-child(4) {
+  font-family: var(--cz-bold);
+  background: var(--cz-red);
+  color: white;
+  transform: rotate(3deg);
+}
+
+.cz-ransom-word:nth-child(5) {
+  font-family: var(--cz-hand);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--cz-red);
+  transform: rotate(-2deg);
+}
+
+/* --- Content --- */
+.cz-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Torn paper section --- */
+.cz-section--paper {
+  background: white;
+  padding: 2.5rem 2rem;
+  margin-bottom: 2rem;
+  clip-path: polygon(
+    1% 2%, 4% 0%, 7% 3%, 13% 1%, 19% 0%, 25% 2%,
+    31% 0%, 37% 1%, 43% 0%, 50% 3%, 56% 1%, 62% 0%,
+    68% 2%, 74% 0%, 80% 1%, 86% 3%, 92% 0%, 98% 1%, 100% 2%,
+    100% 98%, 97% 100%, 91% 98%, 85% 100%, 79% 99%,
+    73% 100%, 67% 98%, 61% 100%, 55% 99%, 49% 100%,
+    43% 98%, 37% 100%, 31% 99%, 25% 100%, 19% 98%,
+    13% 100%, 7% 99%, 1% 100%, 0% 98%
+  );
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+  transform: rotate(var(--rot, 0deg));
+  position: relative;
+}
+
+/* --- Heading --- */
+.cz-heading {
+  font-family: var(--cz-typewriter);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.cz-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--cz-red);
+  transform: rotate(-0.5deg);
+}
+
+/* --- About text --- */
+.cz-about-text {
+  font-family: var(--cz-typewriter);
+  font-size: 0.9rem;
+  line-height: 2;
+  color: #333;
+}
+
+.cz-about-text .highlight {
+  background: var(--cz-yellow);
+  padding: 0 4px;
+}
+
+.cz-about-text .crossed {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.cz-about-text .scrawl {
+  font-family: var(--cz-hand);
+  font-size: 1.3em;
+  color: var(--cz-red);
+}
+
+/* --- Mid-content fragments — image bleeds into body --- */
+.cz-mid-frag {
+  position: relative;
+  margin: 1.5rem 0;
+  background-repeat: no-repeat;
+  border: 3px solid white;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.12);
+  z-index: 0;
+}
+
+.cz-mid-frag--1 {
+  width: 220px;
+  height: 130px;
+  transform: rotate(5deg);
+  clip-path: polygon(3% 2%, 97% 5%, 100% 94%, 0% 100%);
+  background-size: 480%;
+  background-position: 35% 55%;
+  margin-left: auto;
+  margin-right: 2rem;
+}
+
+.cz-mid-frag--2 {
+  width: 190px;
+  height: 110px;
+  transform: rotate(-3.5deg);
+  clip-path: polygon(0% 4%, 100% 0%, 96% 100%, 5% 96%);
+  background-size: 500%;
+  background-position: 65% 35%;
+  margin-left: 1rem;
+}
+
+/* --- Philosophy --- */
+.cz-philosophy {
+  font-family: var(--cz-hand);
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  text-align: center;
+  transform: rotate(-3deg);
+  color: var(--cz-ink);
+  padding: 3rem 1rem;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+
+.cz-philosophy .underline {
+  text-decoration: underline;
+  text-decoration-color: var(--cz-red);
+  text-decoration-thickness: 4px;
+  text-underline-offset: 6px;
+}
+
+/* --- Projects --- */
+.cz-projects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 1rem 0 2rem;
+}
+
+.cz-project {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  width: 220px;
+  padding: 1.5rem;
+  background: white;
+  border: 2px solid var(--cz-ink);
+  position: relative;
+  transition: transform 0.2s;
+  transform: rotate(var(--rot, 0deg));
+}
+
+.cz-project:hover {
+  transform: scale(1.05) rotate(0deg) !important;
+  z-index: 2;
+}
+
+/* Staple */
+.cz-project::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 8px;
+  border: 2px solid #aaa;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+}
+
+.cz-project-name {
+  font-family: var(--cz-bold);
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.cz-project-desc {
+  font-family: var(--cz-typewriter);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* --- Connect --- */
+.cz-connect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  padding: 3rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.cz-connect-link {
+  font-family: var(--cz-typewriter);
+  font-size: 0.9rem;
+  color: var(--cz-ink);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px dashed var(--cz-ink);
+  transform: rotate(var(--rot, 0deg));
+  transition: all 0.2s;
+}
+
+.cz-connect-link:hover {
+  background: var(--cz-yellow);
+  transform: rotate(0deg) scale(1.05);
+}
+
+/* --- Footer --- */
+.cz-footer {
+  text-align: center;
+  padding: 4rem 2rem 6rem;
+  font-family: var(--cz-typewriter);
+  font-size: 0.75rem;
+  color: #888;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .cz-hero { min-height: 50vh; padding: 2rem 1rem; }
+  .cz-hero-complete { width: 92vw; }
+  .cz-projects { flex-direction: column; align-items: center; }
+  .cz-project { width: 85%; }
+  .cz-philosophy { font-size: 2rem; transform: rotate(-1deg); }
+  .cz-frag--1 { width: 65%; height: 45%; }
+  .cz-frag--2 { width: 50%; height: 40%; }
+  .cz-frag--3 { width: 40%; }
+  .cz-frag--4 { width: 42%; }
+  .cz-frag--5 { display: none; }
+  .cz-wash-piece { display: none; }
+  .cz-mid-frag { width: 160px !important; height: 90px !important; }
+}

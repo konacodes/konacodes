@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, createContext, useContext, useCallback } from "react";
+import { useEffect, useState, createContext, useContext, useCallback } from "react";
 import "./index.css";
+import { HomePage } from "./HomePage";
 
 // ============================================
 // Theme Context
@@ -379,132 +380,6 @@ function LabsPage() {
 }
 
 // ============================================
-// Home Page
-// ============================================
-// ============================================
-// Intersection Observer Hook for Collage Pieces
-// ============================================
-function useInView() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  return { ref, visible };
-}
-
-function CollagePiece({ className, delay, children }: {
-  className: string;
-  delay?: number;
-  children: React.ReactNode;
-}) {
-  const { ref, visible } = useInView();
-  return (
-    <div
-      ref={ref}
-      className={`piece ${className} ${visible ? 'visible' : ''}`}
-      style={delay ? { transitionDelay: `${delay}ms` } as React.CSSProperties : undefined}
-    >
-      {children}
-    </div>
-  );
-}
-
-function HomePage() {
-  const { theme } = useTheme();
-
-  return (
-    <div className="page collage-page">
-      <ThemeToggle />
-
-      <header className="collage-hero">
-        <h1 className="collage-hero-name">Kona</h1>
-      </header>
-
-      <main className="pieces">
-        <CollagePiece className="piece-blog" delay={0}>
-          <a href="https://blog.kcodes.me" target="_blank" rel="noopener noreferrer" className="card">
-            <div className="card-label">Writing</div>
-            <h2 className="card-name">Blog</h2>
-            <p className="card-desc">Thoughts, notes, and occasional rants about building things on the web.</p>
-          </a>
-        </CollagePiece>
-
-        <CollagePiece className="piece-films" delay={80}>
-          <a href="https://films.kcodes.me" target="_blank" rel="noopener noreferrer" className="card">
-            <div className="card-label">Catalog</div>
-            <h2 className="card-name">Films</h2>
-            <p className="card-desc">A catalog of everything I've watched</p>
-          </a>
-        </CollagePiece>
-
-        <CollagePiece className="piece-labs" delay={160}>
-          <a href="/labs" className="card">
-            <div className="card-label">Projects</div>
-            <h2 className="card-name">Labs</h2>
-            <p className="card-desc">Experiments and happy accidents</p>
-          </a>
-        </CollagePiece>
-
-        <CollagePiece className="piece-about" delay={100}>
-          <div className="card card-about">
-            <div className="card-label">About</div>
-            <p>Self-taught developer who learned by <em>breaking things</em>. Film nerd, music lover, history enthusiast. Also a protogen.</p>
-          </div>
-        </CollagePiece>
-
-        <CollagePiece className="piece-philosophy" delay={180}>
-          <div className="card card-philosophy">
-            <blockquote>"Ship it raw.<br />Done&nbsp;&gt;&nbsp;perfect."</blockquote>
-          </div>
-        </CollagePiece>
-
-        <CollagePiece className="piece-connect" delay={120}>
-          <div className="card">
-            <div className="card-label">Connect</div>
-            <ul className="connect-list">
-              <li><a href="https://github.com/konacodes" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-              <li><a href="https://discord.com/users/1151230208783945818" target="_blank" rel="noopener noreferrer">Discord</a></li>
-              <li><a href="mailto:hello@kcodes.me">hello@kcodes.me</a></li>
-            </ul>
-          </div>
-        </CollagePiece>
-
-        <CollagePiece className="piece-pages" delay={200}>
-          <div className="pages-row">
-            <a href="/now" className="page-chip">
-              <div className="chip-name">Now</div>
-              <div className="chip-sub">What I'm up to</div>
-            </a>
-            <a href="/uses" className="page-chip">
-              <div className="chip-name">Uses</div>
-              <div className="chip-sub">Tools &amp; setup</div>
-            </a>
-          </div>
-        </CollagePiece>
-      </main>
-
-      <footer className="footer collage-footer">
-        <p className="footer-text">
-          <span className="footer-year">{new Date().getFullYear()}</span>
-          <span className="footer-divider">&middot;</span>
-          <span>Made with questionable sleep habits</span>
-        </p>
-      </footer>
-    </div>
-  );
-}
-
-// ============================================
 // Router
 // ============================================
 function useRoute() {
@@ -546,18 +421,16 @@ function useRoute() {
 export function App() {
   const path = useRoute();
 
-  const renderPage = () => {
-    switch (path) {
-      case '/labs': return <LabsPage />;
-      case '/now': return <NowPage />;
-      case '/uses': return <UsesPage />;
-      default: return <HomePage />;
-    }
-  };
+  // Homepage has its own styling, bypasses ThemeProvider
+  if (path !== '/labs' && path !== '/now' && path !== '/uses') {
+    return <HomePage />;
+  }
 
   return (
     <ThemeProvider>
-      {renderPage()}
+      {path === '/labs' ? <LabsPage /> :
+       path === '/now' ? <NowPage /> :
+       <UsesPage />}
     </ThemeProvider>
   );
 }

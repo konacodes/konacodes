@@ -2,6 +2,10 @@ import { serve } from "bun";
 import index from "./index.html";
 
 const server = serve({
+  static: {
+    "/images/light-bg-hero-section.png": new Response(Bun.file("public/images/light-bg-hero-section.png")),
+    "/images/light-bg-no-text.png": new Response(Bun.file("public/images/light-bg-no-text.png")),
+  },
   routes: {
     // Serve index.html for all unmatched routes.
     "/*": index,
